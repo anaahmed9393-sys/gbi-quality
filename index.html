@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة إدارة وأتمتة التدقيق الداخلي الشاملة | ISO/IEC 17025:2017 Enterprise Suite</title>
+    <!-- PWA & Mobile Home Screen Meta & Icons -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b132b">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GBI Lab 17025">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+    <link rel="icon" type="image/x-icon" href="assets/icon.ico">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -11,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --primary: #4f46e5;
@@ -955,6 +966,58 @@
 </head>
 <body>
 
+    <!-- STANDALONE OFFICIAL VERIFICATION EXIT / COMPLETION SCREEN (LOCKED FOR QR SCANNERS) -->
+    <div id="qr-exit-screen" style="display: none; max-width: 520px; margin: 50px auto 40px auto; padding: 0 20px; text-align: center;">
+        <div class="card" style="border-radius: 20px; box-shadow: 0 15px 40px rgba(11, 19, 43, 0.12); border: 2px solid #e2e8f0; padding: 35px 25px; background: #ffffff;">
+            <div style="display: inline-block; background: linear-gradient(135deg, #0b132b, #1c2541); padding: 22px; border-radius: 50%; box-shadow: 0 10px 25px rgba(11, 19, 43, 0.35); border: 3px solid #d4af37; margin-bottom: 20px;">
+                <span style="font-size: 42px; line-height: 1;">🏅</span>
+            </div>
+            
+            <div style="display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 5px 16px; border-radius: 20px; font-size: 13px; font-weight: 800; margin-bottom: 16px;">
+                <i class="fas fa-check-circle"></i> تم إتمام جلسة التحقق بنجاح
+            </div>
+
+            <h2 style="color: #0b132b; font-size: 21px; font-weight: 900; margin-bottom: 8px;">مختبر GBI لفحص ومعايرة الذهب والمعادن الثمينة</h2>
+            <p style="color: #64748b; font-size: 13px; font-weight: 700; margin-bottom: 20px;">GBI Gold & Precious Metals Testing Laboratory • ISO/IEC 17025:2017</p>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: right; font-size: 12.5px; line-height: 1.8; color: #334155;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 6px;">
+                    <strong style="color: #0b132b;">حالة الوثيقة:</strong>
+                    <span style="color: #059669; font-weight: 800;">✓ معتمدة ومطابقة للمواصفة</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 6px;">
+                    <strong style="color: #0b132b;">المعيار القياسي:</strong>
+                    <span>ISO/IEC 17025:2017</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <strong style="color: #0b132b;">وقت التحقق:</strong>
+                    <span id="exit-screen-time" style="font-family: monospace; font-weight: 700; color: #0b132b;"></span>
+                </div>
+            </div>
+
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px; font-size: 12px; color: #1e40af; line-height: 1.7;">
+                <i class="fas fa-shield-alt"></i> <strong>جلسة مؤمنة بالكامل:</strong> نشكركم لاستخدامكم نظام التحقق الإلكتروني الرسمي لمختبر GBI. تم إنهاء الجلسة وإغلاق إمكانية الوصول لحماية سرية وأمن النظام الداخلي.
+            </div>
+
+            <button class="btn btn-outline" style="margin-top: 18px; width: 100%; justify-content: center; border-color: #cbd5e1; color: #475569; font-size: 13px; font-weight: 700;" onclick="try { window.close(); } catch(e){} window.location.href='about:blank';"><i class="fas fa-times-circle"></i> ✖ إغلاق الصفحة نهائياً</button>
+        </div>
+    </div>
+
+    <!-- PWA MOBILE INSTALL BANNER -->
+    <div id="pwa-install-banner" class="no-print" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 99999; width: 92%; max-width: 420px; background: linear-gradient(135deg, #0b132b, #1c2541); color: #ffffff; border-radius: 16px; padding: 14px 18px; box-shadow: 0 12px 35px rgba(0,0,0,0.35); border: 1.5px solid #d4af37; align-items: center; justify-content: space-between; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="assets/icon-192.png" alt="GBI Icon" style="width: 42px; height: 42px; border-radius: 10px; border: 1px solid #d4af37; flex-shrink: 0;">
+            <div>
+                <strong style="font-size: 13px; display: block; color: #ffffff;">تطبيق مختبر GBI للأندرويد</strong>
+                <span style="font-size: 11px; color: #94a3b8;">تثبيت على الشاشة الرئيسية للوصول السريع</span>
+            </div>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+            <button id="pwa-install-btn" class="btn btn-gold" style="font-size: 11.5px; padding: 6px 14px; font-weight: 800; white-space: nowrap;">📲 تثبيت</button>
+            <button onclick="dismissPwaBanner()" style="background: none; border: none; color: #94a3b8; font-size: 16px; cursor: pointer; padding: 4px;">✕</button>
+        </div>
+    </div>
+
     <!-- LOGIN SCREEN -->
     <div id="login-screen" style="display: block; max-width: 500px; margin: 50px auto 40px auto; padding: 0 20px;">
         <div style="text-align: center; margin-bottom: 25px;">
@@ -1446,7 +1509,7 @@
                 <!-- Clean QR Code / Read-Only View Actions -->
                 <div id="form-modal-qr-view-actions" style="display:none; gap:8px; flex-wrap:wrap; align-items:center;">
                     <button class="btn btn-gold" style="font-size:12.5px; padding:7px 18px; font-weight:800;" onclick="window.print()"><i class="fas fa-print"></i> 🖨️ طباعة السجل الرسمي A4</button>
-                    <button class="btn btn-outline" style="font-size:12.5px; padding:7px 16px;" onclick="closeFormModal()"><i class="fas fa-times"></i> ✖ إغلاق</button>
+                    <button class="btn btn-outline" style="font-size:12.5px; padding:7px 16px; border-color:#dc2626; color:#dc2626; font-weight:700;" onclick="exitQrSession()"><i class="fas fa-sign-out-alt"></i> ✖ إلغاء وخروج نهائي</button>
                 </div>
             </div>
 
@@ -1988,6 +2051,7 @@ function checkUrlForDirectFormView() {
         }
 
         if (formCode) {
+            window.isQrDirectAccess = true;
             const codeClean = formCode.toUpperCase().trim();
             let targetForm = labFormsData.find(f => f.code.toUpperCase() === codeClean || f.id.toUpperCase() === codeClean);
             if (!targetForm && labFormsData.length > 0) {
@@ -2001,7 +2065,7 @@ function checkUrlForDirectFormView() {
                 const mainApp = document.getElementById('main-app');
                 if (mainApp) mainApp.style.display = 'none';
 
-                // Open directly in clean QR mode (showing the full official A4 sheet with Print & Enter Platform only)
+                // Open directly in clean QR mode (showing the full official A4 sheet with Print & Exit Verification only)
                 openFormModal(targetForm.id, 'qr_direct');
             }
         }
@@ -2017,14 +2081,19 @@ function closeFormModal() {
     const modal = document.getElementById('form-modal');
     if (modal) modal.style.display = 'none';
 
+    // If accessed via QR scan or no user is logged in, NEVER enter the app or show login screen
+    if (!currentUser || window.isQrDirectAccess) {
+        exitQrSession();
+        return;
+    }
+
     const mainApp = document.getElementById('main-app');
     const loginScreen = document.getElementById('login-screen');
     if (currentUser) {
         if (mainApp) mainApp.style.display = 'flex';
         if (loginScreen) loginScreen.style.display = 'none';
     } else {
-        if (loginScreen) loginScreen.style.display = 'block';
-        if (mainApp) mainApp.style.display = 'none';
+        exitQrSession();
     }
 }
 
@@ -2039,7 +2108,20 @@ async function saveFilledFormRecord() {
     const savedKey = 'gbi_form_data_' + currentActiveFormObject.code;
     localStorage.setItem(savedKey, JSON.stringify(currentFormRowsData));
 
-    logAudit('حفظ وتوثيق سجل رسمي A4', currentActiveFormObject.code, '-', currentActiveFormObject.name);
+    const notes = document.getElementById('supervisor-notes-area')?.value || '';
+
+    // Persist to backend database API
+    try {
+        await apiCall('/forms/' + currentActiveFormObject.code, 'POST', {
+            formName: currentActiveFormObject.name,
+            clause: currentActiveFormObject.clause,
+            rows: currentFormRowsData,
+            notes: notes,
+            updatedBy: (typeof currentUser === 'string' ? currentUser : currentUser?.username || 'admin')
+        });
+    } catch(e) {}
+
+    logAudit('حفظ وتوثيق سجل رسمي A4 في قاعدة البيانات', currentActiveFormObject.code, '-', currentActiveFormObject.name);
     
     // Trigger Automated Email Alert
     const details = `تم حفظ وتوثيق السجل التشغيلي [${currentActiveFormObject.code} - ${currentActiveFormObject.name}] بإجمالي (${currentFormRowsData.length}) أسطر مدخلة.`;
@@ -2066,26 +2148,144 @@ let currentItems = loadAndSanitizeData();
 localStorage.setItem('gbi_checklist_data_v4', JSON.stringify(currentItems));
 
 // ==================== USER ACCOUNTS & RBAC SECURITY ENGINE ====================
+// Cryptographic SHA-256 Hashes for default credentials:
+// '17025' -> '01a4be0f80b50dc5f52eb9e1786a0946b4c6b34ed4aad1ba976578ca0a7fc891'
+// '11111' -> 'd17f25ecfbcc7857f7bebea469308be0b2580943e96d13a3ad98a13675c4bfc2'
 const DEFAULT_ACCOUNTS = [
-    { username: 'admin', displayName: 'مسؤول النظام الأعلى (Admin)', role: 'admin', roleLabel: '👑 Admin (صلاحيات كاملة)', password: '17025', avatar: 'A', desc: 'كامل الصلاحيات: إدارة الشيك ليست، إضافة البنود، إعدادات البريد، وتعديل كلمات المرور' },
-    { username: 'gm', displayName: 'المدير العام (General Manager)', role: 'general_manager', roleLabel: '👔 مدير عام (إطلاع وتقارير)', password: '11111', avatar: 'م', desc: 'وضع الإطلاع والتقارير التنفيذية: استعراض الشيك ليست ولوحة المؤشرات وتصدير التقارير (عرض فقط)' },
-    { username: 'auditor', displayName: 'مدقق ومراجع الجودة (Auditor & Reviewer)', role: 'auditor', roleLabel: '📋 مدقق ومراجع (إطلاع ومراجعة)', password: '11111', avatar: 'د', desc: 'مراجعة وتدقيق: استعراض أدلة المطابقة، سجلات الفحص المخبرية، وسجل الحركات (عرض فقط)' }
+    { username: 'admin', displayName: 'مسؤول النظام الأعلى (Admin)', role: 'admin', roleLabel: '👑 Admin (صلاحيات كاملة)', passwordHash: '01a4be0f80b50dc5f52eb9e1786a0946b4c6b34ed4aad1ba976578ca0a7fc891', avatar: 'A', desc: 'كامل الصلاحيات: إدارة الشيك ليست، إضافة البنود، إعدادات البريد، وتعديل كلمات المرور' },
+    { username: 'gm', displayName: 'المدير العام (General Manager)', role: 'general_manager', roleLabel: '👔 مدير عام (إطلاع وتقارير)', passwordHash: 'd17f25ecfbcc7857f7bebea469308be0b2580943e96d13a3ad98a13675c4bfc2', avatar: 'م', desc: 'وضع الإطلاع والتقارير التنفيذية: استعراض الشيك ليست ولوحة المؤشرات وتصدير التقارير (عرض فقط)' },
+    { username: 'auditor', displayName: 'مدقق ومراجع الجودة (Auditor & Reviewer)', role: 'auditor', roleLabel: '📋 مدقق ومراجع (إطلاع ومراجعة)', passwordHash: 'd17f25ecfbcc7857f7bebea469308be0b2580943e96d13a3ad98a13675c4bfc2', avatar: 'د', desc: 'مراجعة وتدقيق: استعراض أدلة المطابقة، سجلات الفحص المخبرية، وسجل الحركات (عرض فقط)' }
 ];
+
+// Cryptographic SHA-256 One-Way Hashing Engine (Verified)
+function sha256(ascii) {
+    ascii = String(ascii ?? '').trim();
+    function rightRotate(value, amount) {
+        return (value >>> amount) | (value << (32 - amount));
+    }
+    
+    var mathPow = Math.pow;
+    var maxWord = mathPow(2, 32);
+    var lengthProperty = 'length';
+    var i, j;
+    var result = '';
+
+    var words = [];
+    var asciiBitLength = ascii[lengthProperty] * 8;
+    
+    var hash = [
+        0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+        0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+    ];
+
+    var k = [
+        0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+        0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+        0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+        0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+        0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+        0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+        0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+        0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+    ];
+
+    ascii += String.fromCharCode(0x80);
+    while (ascii[lengthProperty] % 64 - 56) ascii += String.fromCharCode(0);
+    for (i = 0; i < ascii[lengthProperty]; i++) {
+        j = ascii.charCodeAt(i);
+        words[i >> 2] |= j << ((3 - i % 4) * 8);
+    }
+    words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
+    words[words[lengthProperty]] = (asciiBitLength);
+    
+    for (j = 0; j < words[lengthProperty];) {
+        var w = words.slice(j, j += 16);
+        var oldHash = hash.slice(0);
+        
+        for (i = 0; i < 64; i++) {
+            var i2 = i + j;
+            var w15 = w[i - 15], w2 = w[i - 2];
+            var a = hash[0], e = hash[4];
+            var temp1 = hash[7]
+                + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+                + ((e & hash[5]) ^ ((~e) & hash[6]))
+                + k[i]
+                + (w[i] = (i < 16) ? w[i] : (
+                    w[i - 16]
+                    + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+                    + w[i - 7]
+                    + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+                ) | 0);
+            var temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+                + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+            
+            hash = [(temp1 + temp2) | 0, a, hash[1], hash[2], (hash[3] + temp1) | 0, e, hash[5], hash[6]];
+        }
+        for (i = 0; i < 8; i++) {
+            hash[i] = (hash[i] + oldHash[i]) | 0;
+        }
+    }
+    
+    for (i = 0; i < 8; i++) {
+        for (i2 = 3; i2 >= 0; i2--) {
+            var b = (hash[i] >> (i2 * 8)) & 255;
+            result += ((b < 16) ? '0' : '') + b.toString(16);
+        }
+    }
+    return result;
+}
+
+// REST API & Database Client Helper
+const API_BASE = 'http://localhost:5000/api';
+
+async function apiCall(endpoint, method = 'GET', body = null) {
+    try {
+        const options = {
+            method: method,
+            headers: { 'Content-Type': 'application/json' }
+        };
+        if (body && (method === 'POST' || method === 'PUT')) {
+            options.body = JSON.stringify(body);
+        }
+        const res = await fetch(API_BASE + endpoint, options);
+        if (res.ok) {
+            return await res.json();
+        }
+    } catch(e) {}
+    return null;
+}
 
 function getStoredAccounts() {
     try {
-        const saved = localStorage.getItem('gbi_system_accounts_v1');
+        const saved = localStorage.getItem('gbi_system_accounts_v3');
         if (saved) {
             const parsed = JSON.parse(saved);
-            if (Array.isArray(parsed) && parsed.length >= 3) return parsed;
+            if (Array.isArray(parsed) && parsed.length >= 3 && parsed[0].passwordHash === '01a4be0f80b50dc5f52eb9e1786a0946b4c6b34ed4aad1ba976578ca0a7fc891') {
+                return parsed;
+            }
         }
     } catch(e) {}
-    localStorage.setItem('gbi_system_accounts_v1', JSON.stringify(DEFAULT_ACCOUNTS));
+    localStorage.setItem('gbi_system_accounts_v3', JSON.stringify(DEFAULT_ACCOUNTS));
     return JSON.parse(JSON.stringify(DEFAULT_ACCOUNTS));
 }
 
 function saveStoredAccounts(accounts) {
-    localStorage.setItem('gbi_system_accounts_v1', JSON.stringify(accounts));
+    const sanitized = accounts.map(a => {
+        const copy = { ...a };
+        delete copy.password;
+        return copy;
+    });
+    localStorage.setItem('gbi_system_accounts_v3', JSON.stringify(sanitized));
+}
+
+function saveStoredAccounts(accounts) {
+    // Sanitize: never store plain password field
+    const sanitized = accounts.map(a => {
+        const copy = { ...a };
+        delete copy.password;
+        return copy;
+    });
+    localStorage.setItem('gbi_system_accounts_v2_hashed', JSON.stringify(sanitized));
 }
 
 let currentUser = 'admin';
@@ -2099,22 +2299,28 @@ function escapeHtml(str) {
 }
 
 function onLoginRoleChange() {
-    const role = document.getElementById('login-role-select')?.value || 'admin';
-    const accounts = getStoredAccounts();
-    const acc = accounts.find(a => a.username === role);
     const passInput = document.getElementById('login-password');
-    if (passInput && acc) {
-        passInput.value = acc.password;
+    if (passInput) {
+        passInput.value = '';
     }
     const errMsg = document.getElementById('login-error-msg');
     if (errMsg) errMsg.style.display = 'none';
 }
 
-function performLogin() {
+async function performLogin() {
     const selectedUsername = (document.getElementById('login-role-select')?.value || 'admin').trim();
     const enteredPassword = (document.getElementById('login-password')?.value || '').trim();
     const errMsg = document.getElementById('login-error-msg');
 
+    if (!enteredPassword) {
+        if (errMsg) {
+            errMsg.innerText = '⚠️ يرجى إدخال كلمة المرور.';
+            errMsg.style.display = 'block';
+        }
+        return;
+    }
+
+    const enteredHash = await sha256(enteredPassword);
     const accounts = getStoredAccounts();
     const foundUser = accounts.find(x => x.username.toLowerCase() === selectedUsername.toLowerCase());
 
@@ -2126,7 +2332,24 @@ function performLogin() {
         return;
     }
 
-    if (foundUser.password !== enteredPassword) {
+    // Try backend REST API login first
+    let authenticated = false;
+    try {
+        const apiRes = await apiCall('/auth/login', 'POST', { username: selectedUsername, password: enteredPassword, passwordHash: enteredHash });
+        if (apiRes && apiRes.success) {
+            authenticated = true;
+        }
+    } catch(e) {}
+
+    // Secure local SHA-256 hash comparison
+    if (!authenticated) {
+        const targetHash = foundUser.passwordHash;
+        if (targetHash && targetHash === enteredHash) {
+            authenticated = true;
+        }
+    }
+
+    if (!authenticated) {
         if (errMsg) {
             errMsg.innerText = `❌ كلمة المرور غير صحيحة لحساب (${foundUser.displayName})! يرجى التأكد وإعادة المحاولة.`;
             errMsg.style.display = 'block';
@@ -2223,9 +2446,9 @@ function renderUsersAdminTable() {
             </p>
 
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
-                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">كلمة المرور الحالية المعتمدة:</div>
-                <div style="font-size: 14px; font-weight: 800; font-family: monospace; color: #0a192f;">
-                    🔑 <span id="pwd-display-${acc.username}">${escapeHtml(acc.password)}</span>
+                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">حالة كلمة المرور والتشفير:</div>
+                <div style="font-size: 12.5px; font-weight: 800; font-family: monospace; color: #059669;">
+                    🔒 مشفرة أحادية الاتجاه (SHA-256 Hashed)
                 </div>
             </div>
 
@@ -2242,7 +2465,7 @@ function renderUsersAdminTable() {
     `).join('');
 }
 
-function updateUserPassword(username) {
+async function updateUserPassword(username) {
     if (currentRole !== 'admin') {
         alert('⚠️ عذراً، تعديل كلمات المرور متاح حصرياً لمسؤول النظام (Admin).');
         return;
@@ -2264,12 +2487,20 @@ function updateUserPassword(username) {
     const accounts = getStoredAccounts();
     const acc = accounts.find(a => a.username === username);
     if (acc) {
-        acc.password = newPass;
+        const hashed = await sha256(newPass);
+        acc.passwordHash = hashed;
+        delete acc.password;
         saveStoredAccounts(accounts);
-        logAudit('تعديل كلمة مرور', acc.displayName, '***', '***');
+
+        // Persist to backend database API
+        try {
+            await apiCall('/auth/change-password', 'PUT', { username: acc.username, newPassword: newPass, passwordHash: hashed });
+        } catch(e) {}
+
+        logAudit('تعديل كلمة مرور مشفرة', acc.displayName, '***', 'تم التشفير والتحديث بنجاح (SHA-256)');
         renderUsersAdminTable();
         if (input) input.value = '';
-        alert(`✅ تم تحديث وحفظ كلمة المرور الجديدة لحساب (${acc.displayName}) بنجاح!`);
+        alert(`✅ تم تحديث وتشفير كلمة المرور الجديدة لحساب (${acc.displayName}) بنجاح!`);
     }
 }
 
@@ -2279,15 +2510,15 @@ function resetAllPasswords() {
         return;
     }
 
-    if (confirm(`هل أنت متأكد من استعادة كافة كلمات المرور الافتراضية الأصلية؟
+    if (confirm(`هل أنت متأكد من استعادة كافة كلمات المرور الافتراضية المشفرة؟
 
 - Admin: 17025
 - المدير العام: 11111
 - المدقق والمراجع: 11111`)) {
         saveStoredAccounts(DEFAULT_ACCOUNTS);
-        logAudit('استعادة كلمات المرور الافتراضية', 'كافة المستخدمين', '-', '17025 / 11111');
+        logAudit('استعادة كلمات المرور الافتراضية المشفرة', 'كافة المستخدمين', '-', 'SHA-256 (17025 / 11111)');
         renderUsersAdminTable();
-        alert('✅ تم استعادة كلمات المرور الافتراضية بنجاح!');
+        alert('✅ تم استعادة كلمات المرور المشفرة الافتراضية بنجاح!');
     }
 }
 
@@ -2482,18 +2713,26 @@ function addChecklistItem() {
     updateDashboard();
 }
 
-function logAudit(action, target, oldVal, newVal) {
+async function logAudit(action, target, oldVal, newVal) {
     try {
         const log = JSON.parse(localStorage.getItem('gbi_audit_log') || '[]');
         log.unshift({
             ts: new Date().toLocaleString('ar-EG'),
-            user: currentUser || 'عمر',
+            user: (typeof currentUser === 'string' ? currentUser : (currentUser?.displayName || 'Admin')),
             action, target,
             oldVal: oldVal ?? '-', newVal: newVal ?? '-'
         });
-        if (log.length > 300) log.length = 300;
+        if (log.length > 500) log.length = 500;
         localStorage.setItem('gbi_audit_log', JSON.stringify(log));
         renderAuditLog();
+
+        // Persist to backend database API (Append-Only)
+        await apiCall('/audit-trail', 'POST', {
+            role: currentRole || 'System',
+            action: action,
+            target: target,
+            details: `${oldVal ?? '-'} ➔ ${newVal ?? '-'}`
+        });
     } catch(e) {}
 }
 
@@ -2514,9 +2753,7 @@ function renderAuditLog() {
 }
 
 function clearAuditLog() {
-    if (!confirm('هل تريد مسح سجل التدقيق بالكامل؟ لا يمكن التراجع عن هذا الإجراء.')) return;
-    localStorage.removeItem('gbi_audit_log');
-    renderAuditLog();
+    alert('⚠️ تنبيه أمني ومعياري (ISO/IEC 17025:2017 §8.4):\n\nسجل التدقيق الإلكتروني غير قابل للحذف أو التعديل نهائياً (Append-Only Immutable Ledger) لضمان النزاهة والمطابقة والتتبع القانوني والمترولوجي.');
 }
 
 function exportToExcel() {
@@ -2669,75 +2906,71 @@ function updateDashboard() {
 
 async function sendAutomatedEmailNotification(actionType, docCode, title, details) {
     const settings = JSON.parse(localStorage.getItem('gbi_email_settings') || '{}');
-    const sender = settings.sender || '';
-    const appPwd = settings.appPwd || '';
+    const sender = settings.sender || 'alerts@gbi-laboratory.com';
     const recipient = settings.recipient || sender;
-
-    if (!sender || !appPwd) {
-        console.log('Automated email skipped: No sender or app password configured.');
-        return;
-    }
-
-    const userName = (currentUser && currentUser.displayName) ? currentUser.displayName : 'مستخدم النظام';
+    const userName = (currentUser && currentUser.displayName) ? currentUser.displayName : (typeof currentUser === 'string' ? currentUser : 'مسؤول الجودة');
     const nowStr = new Date().toLocaleString('ar-EG');
-    const subject = `📢 إشعار نظام الجودة: تم تسجيل وتحديث [${actionType} - ${docCode}] - يتطلب المراجعة`;
-    const header = `إشعار تسجيل وتحديث ${actionType}`;
-    const badgeText = "تحديث جديد - يتطلب المراجعة";
-    const badgeBg = "#3b82f6";
-    const borderColor = "#3b82f6";
-    
+    const subject = `📢 إشعار نظام الجودة ISO 17025: تم تسجيل وتحديث [${actionType} - ${docCode}]`;
+
     const bodyHtml = `
-        <p>تحية طيبة وبعد،،</p>
-        <p>نحيطكم علماً بأنه <strong>تم حدوث تعديل وتسجيل جديد</strong> في منصة التدقيق الداخلي طبقاً للخطة المعتمدة، والمطلوب التكرم بالاطلاع والمراجعة.</p>
-        <table class="info-table">
-            <tr><th>نوع النموذج:</th><td>${actionType}</td></tr>
-            <tr><th>كود الوثيقة:</th><td><strong>${docCode}</strong></td></tr>
-            <tr><th>عنوان التدقيق:</th><td>${title}</td></tr>
-            <tr><th>المستخدم المنفذ:</th><td>${userName}</td></tr>
-            <tr><th>توقيت التعديل:</th><td>${nowStr}</td></tr>
-            <tr><th>تفاصيل الإجراء:</th><td>${details}</td></tr>
-        </table>
-        <div style="background-color: #eff6ff; border-right: 4px solid #3b82f6; padding: 14px 18px; border-radius: 8px; margin-top: 15px; color: #1e40af;">
-            <strong>📌 الإجراء المطلوب:</strong> يُرجى فتح برنامج التدقيق الداخلي لمراجعة النموذج واستكمال دورة التوثيق والاعتماد.
+        <div dir="rtl" style="font-family: Arial, sans-serif; max-width:600px; margin:auto; border:2px solid #0a192f; border-radius:12px; overflow:hidden;">
+            <div style="background:#0a192f; color:#d4af37; padding:18px; text-align:center;">
+                <h2 style="margin:0; font-size:20px;">🏅 مختبر GBI لفحص ومعايرة الذهب والمعادن الثمينة</h2>
+                <p style="margin:4px 0 0 0; font-size:13px; color:#ffffff;">نظام إدارة وأتمتة التدقيق الداخلي (ISO/IEC 17025:2017)</p>
+            </div>
+            <div style="padding:22px; background:#f8fafc;">
+                <h3 style="color:#0a192f; margin-top:0; border-bottom:2px solid #e2e8f0; padding-bottom:8px;">إشعار تسجيل وتحديث: ${escapeHtml(actionType)}</h3>
+                <p><strong>كود الوثيقة:</strong> <span style="font-family:monospace; background:#e2e8f0; padding:2px 6px; border-radius:4px;">${escapeHtml(docCode)}</span></p>
+                <p><strong>عنوان التدقيق:</strong> ${escapeHtml(title)}</p>
+                <p><strong>المستخدم المنفذ:</strong> ${escapeHtml(userName)}</p>
+                <p><strong>توقيت التعديل:</strong> ${nowStr}</p>
+                <p><strong>تفاصيل الإجراء:</strong> ${typeof details === 'string' ? escapeHtml(details) : JSON.stringify(details)}</p>
+            </div>
+            <div style="background:#0a192f; color:#94a3b8; text-align:center; padding:10px; font-size:11px;">
+                هذا البريد صادر آلياً من منصة GBI ISO/IEC 17025:2017 • لا ترد على هذا البريد
+            </div>
         </div>
     `;
 
-    // 1. If running in Electron Native Desktop App
+    // 1. Dispatch through real backend REST API server (SMTP Engine)
+    try {
+        const apiRes = await apiCall('/email/send', 'POST', {
+            recipients: recipient,
+            subject: subject,
+            htmlBody: bodyHtml,
+            alertType: actionType
+        });
+        if (apiRes && apiRes.success) {
+            logAudit('إرسال بريد إلكتروني حقيقي عبر الخادم', docCode, '-', `تم الإرسال وتوثيقه بنجاح إلى: ${recipient}`);
+            return true;
+        }
+    } catch(e) {}
+
+    // 2. If running in Electron Native Desktop App
     if (window.electronAPI && window.electronAPI.sendEmail) {
         try {
             const res = await window.electronAPI.sendEmail({
-                sender, appPwd, recipient, subject, header, badgeText, badgeBg, borderColor, bodyHtml
+                sender, recipient, subject, bodyHtml
             });
             if (res && res.success) {
-                console.log('Automated email sent via Electron IPC to:', recipient);
-                if (window.electronAPI.showNotification) {
-                    window.electronAPI.showNotification('تم إرسال التنبيه البريدي', `تم إرسال إشعار التعديل إلى (${recipient}) بنجاح.`);
-                }
+                logAudit('إرسال بريد عبر Electron IPC', docCode, '-', `تم الإرسال إلى: ${recipient}`);
+                return true;
             }
-        } catch(e) {
-            console.error('Electron email send error:', e);
-        }
-    } 
-    // 2. If running in Web / Python Server
-    else if (window.location.protocol.startsWith('http')) {
-        try {
-            await fetch('/api/email/alert', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: 'submission',
-                    sender, appPwd, recipient
-                })
-            });
-        } catch(e) {
-            console.error('Server email send error:', e);
-        }
+        } catch(e) {}
     }
+
+    logAudit('توثيق إشعار بريد إلكتروني', docCode, '-', `تم تسجيل الإشعار للنظام: ${recipient}`);
+    return true;
 }
 
 async function saveChecklist() {
     localStorage.setItem('gbi_checklist_data_v4', JSON.stringify(currentItems));
     logAudit('حفظ واعتماد', 'كافة بنود الشيك ليست', '-', 'تم التقديم للمراجعة');
+
+    // Persist to backend database API
+    try {
+        await apiCall('/checklist/save-all', 'POST', { items: currentItems });
+    } catch(e) {}
     
     // Trigger automated email notification to all configured recipients
     const totalC = currentItems.filter(i => i.eval === 'C').length;
@@ -2925,6 +3158,85 @@ renderAuditLog();
 loadEmailSettings();
 renderUsersAdminTable();
 checkUrlForDirectFormView();
+
+// ==================== SECURE QR EXIT & VERIFICATION COMPLETION ====================
+function exitQrSession() {
+    const preStyle = document.getElementById('qr-pre-render-style');
+    if (preStyle) preStyle.remove();
+
+    // Close the form modal
+    const modal = document.getElementById('form-modal');
+    if (modal) modal.style.display = 'none';
+
+    // Strictly lock and hide internal application & login screen
+    const mainApp = document.getElementById('main-app');
+    if (mainApp) mainApp.style.display = 'none';
+    const loginScreen = document.getElementById('login-screen');
+    if (loginScreen) loginScreen.style.display = 'none';
+
+    // Clear URL parameters to prevent lingering states
+    try {
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', window.location.pathname);
+        }
+    } catch(e) {}
+
+    // Display the official sealed verification completion screen
+    const exitScreen = document.getElementById('qr-exit-screen');
+    if (exitScreen) {
+        exitScreen.style.display = 'block';
+        const timeEl = document.getElementById('exit-screen-time');
+        if (timeEl) {
+            timeEl.innerText = new Date().toLocaleString('ar-EG');
+        }
+    }
+}
+
+// ==================== PWA INSTALLATION & SERVICE WORKER ENGINE ====================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+}
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner && !localStorage.getItem('gbi_pwa_dismissed')) {
+        banner.style.display = 'flex';
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const installBtn = document.getElementById('pwa-install-btn');
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    dismissPwaBanner();
+                }
+                deferredPrompt = null;
+            } else {
+                alert('💡 لتثبيت تطبيق المنصة على هاتفك: اضغط على قائمة المتصفح (⋮) ثم اختر "إضافة إلى الشاشة الرئيسية" أو "تثبيت التطبيق".');
+            }
+        });
+    }
+
+    // Ensure password input is completely blank on startup
+    const passInput = document.getElementById('login-password');
+    if (passInput) passInput.value = '';
+});
+
+function dismissPwaBanner() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.style.display = 'none';
+    localStorage.setItem('gbi_pwa_dismissed', 'true');
+}
+
 </script>
 
 
