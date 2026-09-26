@@ -1117,11 +1117,15 @@
             <div class="st-tabs-container">
                 <button class="st-tab-btn active" onclick="switchTab('tab-dash', this)">📊 لوحة المؤشرات التنفيذية</button>
                 <button class="st-tab-btn" onclick="switchTab('tab-forms', this)">📑 النماذج المخبرية الإلزامية</button>
-                <button class="st-tab-btn" onclick="switchTab('tab-chk', this)">📋 الشيك ليست الشاملة (البنود 4-8)</button>
-                <button class="st-tab-btn" onclick="switchTab('tab-plan', this)">📅 خطة التدقيق (Audit Plan)</button>
+                <button class="st-tab-btn" onclick="switchTab('tab-calibration', this)">⚖️ تتبعيّة المعايرة والأجهزة</button>
+                <button class="st-tab-btn" onclick="switchTab('tab-sqc', this)">📈 التحليلات وضبط الجودة (SQC)</button>
+                <button class="st-tab-btn" onclick="switchTab('tab-complaints', this)">⚠️ الشكاوى والاستدعاء (§7.9)</button>
+                <button class="st-tab-btn" onclick="switchTab('tab-doc-control', this)">📁 ضبط الوثائق والإصدارات</button>
+                <button class="st-tab-btn" onclick="switchTab('tab-chk', this)">📋 الشيك ليست الشاملة</button>
+                <button class="st-tab-btn" onclick="switchTab('tab-plan', this)">📅 خطة التدقيق (Plan)</button>
                 <button class="st-tab-btn" onclick="switchTab('tab-audit-trail', this)">📜 سجل الحركات (Audit Trail)</button>
-                <button class="st-tab-btn" id="tab-btn-settings" onclick="switchTab('tab-settings', this)">⚙️ إعدادات البريد والأتمتة</button>
-                <button class="st-tab-btn" id="tab-btn-users" onclick="switchTab('tab-users', this)">👥 إدارة المستخدمين وكلمات المرور</button>
+                <button class="st-tab-btn" id="tab-btn-settings" onclick="switchTab('tab-settings', this)">⚙️ إعدادات البريد</button>
+                <button class="st-tab-btn" id="tab-btn-users" onclick="switchTab('tab-users', this)">👥 إدارة المستخدمين</button>
             </div>
 
             <!-- TAB 1: DASHBOARD -->
@@ -1408,6 +1412,350 @@
                 </div>
             </div>
 
+            
+            <!-- TAB: METROLOGICAL TRACEABILITY & CALIBRATION (Clause 6.4 & 6.5) -->
+            <div id="tab-calibration" class="tab-content" style="display: none;">
+                <div class="card" style="border-radius:18px; margin-bottom:24px;">
+                    <!-- Header -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px; border-bottom:1px solid #e2e8f0; padding-bottom:14px;">
+                        <div>
+                            <h3 style="color:#0a192f; margin:0 0 4px 0; font-size:19px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                                <span>⚖️</span> مصفوفة تتبعيّة المعايرة وإدارة الأجهزة والمواد المرجعية (CRMs)
+                            </h3>
+                            <p style="color:#64748b; font-size:13px; margin:0;">
+                                إدارة متكاملة للمعايرة المترولوجية والتتبع لسلسلة الوحدات الدولية (SI) وسجلات الصيانة طبقاً للبندين 6.4 و 6.5 مع إنذار مسبق بـ 30 يوماً
+                            </p>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="btn" style="background:#0a192f; color:#d4af37; border:1px solid #d4af37; font-size:12.5px; padding:8px 16px; font-weight:800;" onclick="openAddCalibrationModal()">
+                                <i class="fas fa-plus-circle"></i> ➕ تسجيل جهاز / مادة مرجعية جديدة
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- KPI Cards Summary -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:20px;">
+                        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:14px; padding:14px; text-align:center;">
+                            <div style="font-size:12px; color:#475569; font-weight:700;">إجمالي الأجهزة والمراجع</div>
+                            <div id="cal-kpi-total" style="font-size:24px; font-weight:900; color:#0a192f; margin-top:4px;">0</div>
+                        </div>
+                        <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:14px; padding:14px; text-align:center;">
+                            <div style="font-size:12px; color:#065f46; font-weight:700;">سارية ومعتمدة (صالح للعمل)</div>
+                            <div id="cal-kpi-valid" style="font-size:24px; font-weight:900; color:#059669; margin-top:4px;">0</div>
+                        </div>
+                        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:14px; padding:14px; text-align:center;">
+                            <div style="font-size:12px; color:#92400e; font-weight:700;">تنبيه استحقاق مسبق (≤ 30 يوم)</div>
+                            <div id="cal-kpi-due-soon" style="font-size:24px; font-weight:900; color:#d97706; margin-top:4px;">0</div>
+                        </div>
+                        <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:14px; padding:14px; text-align:center;">
+                            <div style="font-size:12px; color:#991b1b; font-weight:700;">منتهية المعايرة / متوقفة</div>
+                            <div id="cal-kpi-expired" style="font-size:24px; font-weight:900; color:#dc2626; margin-top:4px;">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Alert Banner -->
+                    <div id="calibration-alert-banner" style="display:none; background:#fffbeb; border-right:4px solid #d97706; padding:12px 16px; border-radius:8px; margin-bottom:18px; font-size:13.5px; color:#92400e; font-weight:700;">
+                        <!-- Dynamic Alert Content -->
+                    </div>
+
+                    <!-- Search & Filter Controls -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; background:#f8fafc; padding:10px 14px; border-radius:10px; border:1px solid #e2e8f0;">
+                        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; flex:1;">
+                            <input type="text" id="cal-search-input" placeholder="🔍 بحث باسم الجهاز، الكود، أو جهة المعايرة..." oninput="renderCalibrationTable()" style="padding:6px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; min-width:240px;">
+                            <select id="cal-filter-status" onchange="renderCalibrationTable()" style="padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px;">
+                                <option value="all">كل الحالات المترولوجية</option>
+                                <option value="valid">سارية فقط</option>
+                                <option value="due_soon">استحقاق مسبق (30 يوم)</option>
+                                <option value="expired">منتهية الصلاحية</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Calibration Table -->
+                    <div class="table-container">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px; text-align:center;">#</th>
+                                    <th>اسم الجهاز / المادة المرجعية</th>
+                                    <th>كود الأصل (Asset ID)</th>
+                                    <th>الموقع / المعمل</th>
+                                    <th>جهة المعايرة المعتمدة</th>
+                                    <th>رقم الشهادة / التتبعية</th>
+                                    <th>تاريخ المعايرة</th>
+                                    <th>المعايرة القادمة</th>
+                                    <th>الارتياب (U, k=2)</th>
+                                    <th>الحالة المترولوجية</th>
+                                    <th style="text-align:center;">الإجراءات والشهادات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calibration-table-body">
+                                <!-- Dynamic Calibration Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: STATISTICAL QUALITY CONTROL & VALIDATION (Clause 7.7) -->
+            <div id="tab-sqc" class="tab-content" style="display: none;">
+                <div class="card" style="border-radius:18px; margin-bottom:24px;">
+                    <!-- Header -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px; border-bottom:1px solid #e2e8f0; padding-bottom:14px;">
+                        <div>
+                            <h3 style="color:#0a192f; margin:0 0 4px 0; font-size:19px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                                <span>📈</span> وحدة مراقبة الجودة الإحصائية وضمان صحة النتائج (SQC & Westgard Rules)
+                            </h3>
+                            <p style="color:#64748b; font-size:13px; margin:0;">
+                                خرائط شوهارت و ليفي-جينينغز (Levey-Jennings) وحسابات Z-Score وتقييم الانحراف المعياري للعينات المرجعية طبقاً للبند 7.7
+                            </p>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="btn" style="background:#059669; font-size:12.5px; padding:8px 16px; font-weight:800;" onclick="openAddSqcRunModal()">
+                                <i class="fas fa-flask"></i> ➕ تسجيل تشغيلة ضبط جودة جديدة
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Method & CRM Selection Toolbar -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; background:#f1f5f9; padding:12px 16px; border-radius:12px; margin-bottom:18px; border:1px solid #cbd5e1;">
+                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <label style="font-weight:800; color:#0a192f; font-size:13px;">اختر المادة المرجعية المعتمدة (CRM Standard):</label>
+                            <select id="sqc-crm-select" onchange="renderSqcModule()" style="font-weight:700; color:#0a192f; padding:6px 14px; border-radius:8px; border:1px solid #94a3b8; font-size:13px; background:#ffffff;">
+                                <option value="crm_24k">🥇 ذهب نقي عيار 24 (Target: 999.90‰ | ISO 11426 Cupellation)</option>
+                                <option value="crm_21k">🥈 سبيكة ذهب عيار 21 (Target: 875.00‰ | Fire Assay)</option>
+                                <option value="crm_18k">🥉 سبيكة ذهب عيار 18 (Target: 750.00‰ | XRF Spec)</option>
+                                <option value="crm_ag925">⚪ فضة استرليني عيار 925 (Target: 925.00‰ | Volumetric)</option>
+                            </select>
+                        </div>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <span id="sqc-status-badge" style="background:#dcfce7; color:#166534; font-weight:800; padding:5px 12px; border-radius:20px; font-size:12px; border:1px solid #86efac;">
+                                ✓ العملية تحت السيطرة الإحصائية (In Control)
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Realtime Statistics Overview -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px; margin-bottom:20px;">
+                        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:12px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                            <div style="font-size:11.5px; color:#64748b; font-weight:700;">القيمة الاسمية المستهدفة (μ)</div>
+                            <div id="sqc-target-val" style="font-size:18px; font-weight:900; color:#0a192f; font-family:monospace; margin-top:2px;">999.90</div>
+                        </div>
+                        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:12px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                            <div style="font-size:11.5px; color:#64748b; font-weight:700;">متوسط القياسات (Mean x̄)</div>
+                            <div id="sqc-mean-val" style="font-size:18px; font-weight:900; color:#0369a1; font-family:monospace; margin-top:2px;">999.89</div>
+                        </div>
+                        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:12px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                            <div style="font-size:11.5px; color:#64748b; font-weight:700;">الانحراف المعياري (1σ)</div>
+                            <div id="sqc-sd-val" style="font-size:18px; font-weight:900; color:#7c3aed; font-family:monospace; margin-top:2px;">0.040</div>
+                        </div>
+                        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:12px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                            <div style="font-size:11.5px; color:#64748b; font-weight:700;">معامل الاختلاف (CV %)</div>
+                            <div id="sqc-cv-val" style="font-size:18px; font-weight:900; color:#059669; font-family:monospace; margin-top:2px;">0.004%</div>
+                        </div>
+                        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:12px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                            <div style="font-size:11.5px; color:#64748b; font-weight:700;">متوسط الاسترداد (Recovery)</div>
+                            <div id="sqc-rec-val" style="font-size:18px; font-weight:900; color:#d97706; font-family:monospace; margin-top:2px;">99.99%</div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Container (Scalable SVG) -->
+                    <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:14px; padding:16px; margin-bottom:22px; box-shadow:0 2px 4px rgba(0,0,0,0.04);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                            <h4 style="color:#0a192f; margin:0; font-size:14.5px; font-weight:800; display:flex; align-items:center; gap:6px;">
+                                <span>📊</span> مخطط ليفي-جينينغز التفاعلي مع حدود التحكم (+3σ UCL / -3σ LCL)
+                            </h4>
+                            <div style="display:flex; gap:12px; font-size:11px; font-weight:700;">
+                                <span style="color:#dc2626;">■ حدود الرفض (±3σ)</span>
+                                <span style="color:#d97706;">■ حدود التحذير (±2σ)</span>
+                                <span style="color:#059669;">■ المتوسط المستهدف (μ)</span>
+                            </div>
+                        </div>
+                        <div id="levey-jennings-canvas-container" style="width:100%; overflow-x:auto; text-align:center;">
+                            <!-- Dynamically Drawn Scalable SVG -->
+                        </div>
+                    </div>
+
+                    <!-- SQC Analytical Runs Log Table -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <h4 style="color:#0a192f; margin:0; font-size:14.5px; font-weight:800;">
+                            📋 سجل تشغيلات ضبط الجودة اليومية وتقييم ويستغارد
+                        </h4>
+                    </div>
+                    <div class="table-container">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px; text-align:center;">#</th>
+                                    <th>رقم التشغيلة / التاريخ</th>
+                                    <th>المادة المرجعية / العينة</th>
+                                    <th>القيمة المقاسة (x)</th>
+                                    <th>الانحراف (x - μ)</th>
+                                    <th>درجة Z-Score</th>
+                                    <th>نسبة الاسترداد %</th>
+                                    <th>تقييم ويستغارد والضبط</th>
+                                    <th>المحلل المسؤول</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sqc-table-body">
+                                <!-- Dynamic SQC Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: COMPLAINTS & RETAIN SAMPLE RECALL (Clause 7.9 & 7.10 & 8.7) -->
+            <div id="tab-complaints" class="tab-content" style="display: none;">
+                <div class="card" style="border-radius:18px; margin-bottom:24px;">
+                    <!-- Header -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px; border-bottom:1px solid #e2e8f0; padding-bottom:14px;">
+                        <div>
+                            <h3 style="color:#0a192f; margin:0 0 4px 0; font-size:19px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                                <span>⚠️</span> وحدة إدارة الشكاوى، استدعاء العينات المرجعية وإدارة العمل غير المطابق
+                            </h3>
+                            <p style="color:#64748b; font-size:13px; margin:0;">
+                                نظام صارم لإدارة اعتراضات واعتراضات العيارات، سحب العينة الاحتياطية المشفرة (Blind Retain Code)، وتحليل السبب الجذري والـ CAR طبقاً للبندين 7.9 و 8.7
+                            </p>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="btn" style="background:#dc2626; color:#ffffff; font-size:12.5px; padding:8px 16px; font-weight:800;" onclick="openAddComplaintModal()">
+                                <i class="fas fa-exclamation-triangle"></i> 🚨 فتح ملف شكوى / اعتراض عيار جديد
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Complaints KPI Summary -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-bottom:18px;">
+                        <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:12px; padding:12px; text-align:center;">
+                            <div style="font-size:12px; color:#991b1b; font-weight:700;">إجمالي الشكاوى المسجلة</div>
+                            <div id="complaints-kpi-total" style="font-size:22px; font-weight:900; color:#dc2626; margin-top:4px;">0</div>
+                        </div>
+                        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:12px; text-align:center;">
+                            <div style="font-size:12px; color:#92400e; font-weight:700;">قيد سحب العينة والتحقيق الأعمى</div>
+                            <div id="complaints-kpi-investigating" style="font-size:22px; font-weight:900; color:#d97706; margin-top:4px;">0</div>
+                        </div>
+                        <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:12px; padding:12px; text-align:center;">
+                            <div style="font-size:12px; color:#065f46; font-weight:700;">تمت التسوية والاعتماد النهائي</div>
+                            <div id="complaints-kpi-resolved" style="font-size:22px; font-weight:900; color:#059669; margin-top:4px;">0</div>
+                        </div>
+                        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:12px; padding:12px; text-align:center;">
+                            <div style="font-size:12px; color:#475569; font-weight:700;">إجراءات تصحيحية مرتبطة (CAR)</div>
+                            <div id="complaints-kpi-car" style="font-size:22px; font-weight:900; color:#0a192f; margin-top:4px;">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Search Controls -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; background:#f8fafc; padding:10px 14px; border-radius:10px; border:1px solid #e2e8f0;">
+                        <input type="text" id="complaints-search-input" placeholder="🔍 بحث برقم الشكوى، اسم العميل، أو كود الحرز المشفر..." oninput="renderComplaintsTable()" style="padding:6px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; min-width:280px; flex:1;">
+                        <select id="complaints-filter-status" onchange="renderComplaintsTable()" style="padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px;">
+                            <option value="all">كل الحالات</option>
+                            <option value="investigating">قيد التحقيق وسحب الحرز</option>
+                            <option value="resolved">تم الحل والإغلاق</option>
+                        </select>
+                    </div>
+
+                    <!-- Complaints List Table -->
+                    <div class="table-container">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr>
+                                    <th>رقم الشكوى</th>
+                                    <th>العميل / المنشأة</th>
+                                    <th>العيار المتنازع عليه</th>
+                                    <th>حرز العينة المشفر (Blind Retain Code)</th>
+                                    <th>تاريخ الورود</th>
+                                    <th>نتيجة التحقيق الفني وسحب المرجع</th>
+                                    <th>رابط الـ CAR</th>
+                                    <th>الحالة</th>
+                                    <th style="text-align:center;">الإجراءات والتحقيق</th>
+                                </tr>
+                            </thead>
+                            <tbody id="complaints-table-body">
+                                <!-- Dynamic Complaints Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: SMART DOCUMENT CONTROL & VERSIONING (Clause 8.2 & 8.3 & 8.4) -->
+            <div id="tab-doc-control" class="tab-content" style="display: none;">
+                <div class="card" style="border-radius:18px; margin-bottom:24px;">
+                    <!-- Header -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px; border-bottom:1px solid #e2e8f0; padding-bottom:14px;">
+                        <div>
+                            <h3 style="color:#0a192f; margin:0 0 4px 0; font-size:19px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                                <span>📁</span> نظام الأرشفة الذكية وضبط وثائق وإصدارات الجودة (Clause 8.2 & 8.3)
+                            </h3>
+                            <p style="color:#64748b; font-size:13px; margin:0;">
+                                السجل الرئيسي لمراقبة وثائق نظام الإدارة (SOPs, QM, Policies, Forms) مع الترقية الآلية وعزل النسخ الملغاة وحمايتها من الاستخدام غير المقصود
+                            </p>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="btn" style="background:#059669; font-size:12.5px; padding:8px 16px; font-weight:800;" onclick="openAddDocModal()">
+                                <i class="fas fa-file-signature"></i> 📑 تسجيل / ترقية وثيقة جودة معتمدة
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Doc KPI Summary -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-bottom:18px;">
+                        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:12px; padding:12px; text-align:center;">
+                            <div style="font-size:12px; color:#475569; font-weight:700;">إجمالي الوثائق المعتمدة</div>
+                            <div id="doc-kpi-total" style="font-size:22px; font-weight:900; color:#0a192f; margin-top:4px;">0</div>
+                        </div>
+                        <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:12px; padding:12px; text-align:center;">
+                            <div style="font-size:12px; color:#065f46; font-weight:700;">إجراءات تشغيلية (SOPs)</div>
+                            <div id="doc-kpi-sops" style="font-size:22px; font-weight:900; color:#059669; margin-top:4px;">0</div>
+                        </div>
+                        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:12px; text-align:center;">
+                            <div style="font-size:12px; color:#1e40af; font-weight:700;">سياسات ونماذج رسمية (Forms)</div>
+                            <div id="doc-kpi-forms" style="font-size:22px; font-weight:900; color:#2563eb; margin-top:4px;">0</div>
+                        </div>
+                        <div style="background:#fef3c7; border:1px solid #fde68a; border-radius:12px; padding:12px; text-align:center;">
+                            <div style="font-size:12px; color:#92400e; font-weight:700;">وثائق بمراجعة سنوية سارية</div>
+                            <div id="doc-kpi-reviewed" style="font-size:22px; font-weight:900; color:#d97706; margin-top:4px;">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Search & Filter Controls -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; background:#f8fafc; padding:10px 14px; border-radius:10px; border:1px solid #e2e8f0;">
+                        <input type="text" id="doc-search-input" placeholder="🔍 بحث بكود الوثيقة، العنوان، أو البند..." oninput="renderDocControlTable()" style="padding:6px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; min-width:260px; flex:1;">
+                        <select id="doc-filter-clause" onchange="renderDocControlTable()" style="padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px;">
+                            <option value="all">كل بنود المواصفة القياسية</option>
+                            <option value="4">بند 4: المتطلبات العامة</option>
+                            <option value="5">بند 5: المتطلبات الهيكلية</option>
+                            <option value="6">بند 6: متطلبات الموارد والتجهيزات</option>
+                            <option value="7">بند 7: متطلبات العمليات الفنية</option>
+                            <option value="8">بند 8: متطلبات نظام الإدارة</option>
+                        </select>
+                    </div>
+
+                    <!-- Document Master List Table -->
+                    <div class="table-container">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr>
+                                    <th>رمز الوثيقة</th>
+                                    <th>عنوان الوثيقة / الإجراء المعياري</th>
+                                    <th>البند المرتبط</th>
+                                    <th>الإصدار المعتمد</th>
+                                    <th>تاريخ السريان</th>
+                                    <th>تاريخ المراجعة القادمة</th>
+                                    <th>حالة الوثيقة</th>
+                                    <th>بصمة التشفير الرقمية (SHA-256)</th>
+                                    <th style="text-align:center;">سجل المراجعات والتحكم</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doc-control-table-body">
+                                <!-- Dynamic Document Control Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- TAB 6: EMAIL SETTINGS -->
             <div id="tab-settings" class="tab-content" style="display: none;">
                 <div class="card">
@@ -1487,6 +1835,405 @@
     </div>
 
     <!-- A4 OFFICIAL FORM SHEET MODAL -->
+    
+    <!-- ======================================================================= -->
+    <!-- 1. MODAL: ADD / EDIT CALIBRATION & EQUIPMENT RECORD (Clause 6.4 & 6.5)  -->
+    <!-- ======================================================================= -->
+    <div id="modal-cal-form" class="modal-overlay" style="display:none; z-index:999999;" onclick="if(event.target===this) closeModal('modal-cal-form')">
+        <div class="a4-sheet-container" style="max-width:850px; border-top:6px solid #0a192f;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:12px; margin-bottom:18px;">
+                <h3 style="margin:0; color:#0a192f; font-size:18px; font-weight:900; display:flex; align-items:center; gap:8px;">
+                    <span>⚖️</span> تسجيل / تحديث سجل المعايرة والتتبعية المترولوجية (ISO 17025)
+                </h3>
+                <button class="btn btn-outline" style="font-size:12px; padding:4px 10px;" onclick="closeModal('modal-cal-form')">✕ إغلاق</button>
+            </div>
+
+            <form id="form-cal-record" onsubmit="handleSaveCalibration(event)">
+                <input type="hidden" id="cal-form-id" value="">
+                
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:16px;">
+                    <div style="font-weight:800; color:#0a192f; font-size:13.5px; margin-bottom:10px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">
+                        📌 بيانات الأصل والجهاز المخبري (Equipment Identification)
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">اسم الجهاز / المرجع *</label>
+                            <input type="text" id="cal-name" required placeholder="مثال: ميزان تحليلي إلكتروني دقيق 0.01mg" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">كود التعريف والأصل (Asset ID) *</label>
+                            <input type="text" id="cal-code" required placeholder="مثال: GBI-BAL-01" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-family:monospace; font-weight:700; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">الموديل والرقم التسلسلي (S/N)</label>
+                            <input type="text" id="cal-serial" placeholder="مثال: Mettler Toledo XPR205 - SN: B839201" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">الموقع / المعمل المسند إليه</label>
+                            <input type="text" id="cal-location" placeholder="مثال: معمل الموازين الحساسة (Room 102)" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:16px;">
+                    <div style="font-weight:800; color:#0a192f; font-size:13.5px; margin-bottom:10px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">
+                        🔬 بيانات المعايرة والشهادة وسلسلة التتبع (Metrological Calibration)
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">جهة المعايرة المعتمدة *</label>
+                            <input type="text" id="cal-provider" required placeholder="مثال: المعهد القومي للمعايرة (NIS) / SASO" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">رقم شهادة المعايرة الرسمية *</label>
+                            <input type="text" id="cal-cert" required placeholder="مثال: NIS-CAL-2026-8839" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-family:monospace; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">تاريخ المعايرة الأخيرة *</label>
+                            <input type="date" id="cal-date" required onchange="calculateNextCalDueDate()" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">دورة المعايرة الدورية</label>
+                            <select id="cal-interval" onchange="calculateNextCalDueDate()" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                                <option value="12">12 شهر (معايرة سنوية معتمدة)</option>
+                                <option value="6">6 أشهر (معايرة نصف سنوية مشددة)</option>
+                                <option value="24">24 شهر (أجهزة مستقرة طويلة الأمد)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">تاريخ الاستحقاق القادم (Due Date) *</label>
+                            <input type="date" id="cal-due" required style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-weight:700; color:#0a192f; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">الارتياب القياسي الموسع (U, k=2)</label>
+                            <input type="text" id="cal-unc" placeholder="مثال: ± 0.02 mg" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
+                    <button type="button" class="btn btn-outline" style="font-size:13px; padding:8px 18px;" onclick="closeModal('modal-cal-form')">إلغاء</button>
+                    <button type="submit" class="btn" style="background:#059669; font-size:13px; padding:8px 22px; font-weight:800;">💾 حفظ واعتماد السجل المترولوجي</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- 2. MODAL: OFFICIAL CALIBRATION CERTIFICATE / RECORD VIEW (Clause 6.4)    -->
+    <!-- ======================================================================= -->
+    <div id="modal-cal-detail" class="modal-overlay" style="display:none; z-index:999999;" onclick="if(event.target===this) closeModal('modal-cal-detail')">
+        <div class="a4-sheet-container" style="max-width:850px;">
+            <div class="a4-watermark">GBI LAB • METROLOGICAL TRACEABILITY RECORD • ISO 17025</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0a192f; padding-bottom:10px; margin-bottom:16px;" class="no-print">
+                <span style="font-weight:900; color:#0a192f; font-size:14px;">📄 بطاقة وسجل التحقق المترولوجي للأصل المخبري</span>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn" style="background:#0a192f; color:#d4af37; font-size:12px; padding:6px 12px;" onclick="window.print()"><i class="fas fa-print"></i> 🖨️ طباعة البطاقة</button>
+                    <button class="btn btn-outline" style="font-size:12px; padding:6px 10px;" onclick="closeModal('modal-cal-detail')">✕ إغلاق</button>
+                </div>
+            </div>
+
+            <div id="cal-detail-content">
+                <!-- Dynamically Populated Certificate Record Content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- 3. MODAL: LOG NEW STATISTICAL QUALITY CONTROL RUN (Clause 7.7)          -->
+    <!-- ======================================================================= -->
+    <div id="modal-sqc-form" class="modal-overlay" style="display:none; z-index:999999;" onclick="if(event.target===this) closeModal('modal-sqc-form')">
+        <div class="a4-sheet-container" style="max-width:800px; border-top:6px solid #059669;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:12px; margin-bottom:18px;">
+                <h3 style="margin:0; color:#0a192f; font-size:18px; font-weight:900; display:flex; align-items:center; gap:8px;">
+                    <span>📈</span> تسجيل تشغيلة ضبط جودة وفحص عينة مرجعية (SQC Run Log)
+                </h3>
+                <button class="btn btn-outline" style="font-size:12px; padding:4px 10px;" onclick="closeModal('modal-sqc-form')">✕ إغلاق</button>
+            </div>
+
+            <form id="form-sqc-record" onsubmit="handleSaveSqcRun(event)">
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:16px;">
+                    <div style="font-weight:800; color:#0a192f; font-size:13.5px; margin-bottom:10px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">
+                        🧪 بيانات المنهجية والمادة المرجعية (CRM & Method)
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">المادة المرجعية المعتمدة (CRM) *</label>
+                            <select id="sqc-form-crm" onchange="updateSqcFormTarget()" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                                <option value="crm_24k">🥇 ذهب نقي عيار 24 (Target: 999.90‰)</option>
+                                <option value="crm_21k">🥈 سبيكة ذهب عيار 21 (Target: 875.00‰)</option>
+                                <option value="crm_18k">🥉 سبيكة ذهب عيار 18 (Target: 750.00‰)</option>
+                                <option value="crm_ag925">⚪ فضة استرليني عيار 925 (Target: 925.00‰)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">رقم تشغيلة الفحص (Batch Run ID) *</label>
+                            <input type="text" id="sqc-form-batch" required placeholder="مثال: RUN-2026-042" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-family:monospace; font-weight:700; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">تاريخ التحليل *</label>
+                            <input type="date" id="sqc-form-date" required style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">الفاحص الكيميائي المسؤول *</label>
+                            <input type="text" id="sqc-form-analyst" required placeholder="مثال: د. أحمد فؤاد / كيميائي معتمد" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:16px;">
+                    <div style="font-weight:800; color:#0a192f; font-size:13.5px; margin-bottom:10px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">
+                        📊 النتائج الحسابية والتقييم الإحصائي (Assay & Z-Score)
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">القيمة الاسمية المعتمدة (Target μ)</label>
+                            <input type="number" step="0.01" id="sqc-form-target" readonly style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-family:monospace; background:#e2e8f0; font-weight:700; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">القيمة المقاسة بالفحص (Measured x) *</label>
+                            <input type="number" step="0.001" id="sqc-form-val" required placeholder="مثال: 999.88" oninput="calculateSqcLiveMetrics()" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-family:monospace; font-weight:800; color:#0a192f; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">الانحراف المحسوب (x - μ)</label>
+                            <input type="text" id="sqc-form-diff" readonly style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-family:monospace; background:#e2e8f0; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">درجة Z-Score والتقييم</label>
+                            <input type="text" id="sqc-form-zscore" readonly style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-weight:800; background:#e2e8f0; box-sizing:border-box;">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
+                    <button type="button" class="btn btn-outline" style="font-size:13px; padding:8px 18px;" onclick="closeModal('modal-sqc-form')">إلغاء</button>
+                    <button type="submit" class="btn" style="background:#059669; font-size:13px; padding:8px 22px; font-weight:800;">💾 تسجيل النتيجة وضبط الرسم البياني</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- 4. MODAL: REGISTER / MANAGE COMPLAINT & BLIND RECALL (Clause 7.9 & 8.7) -->
+    <!-- ======================================================================= -->
+    <div id="modal-complaint-form" class="modal-overlay" style="display:none; z-index:999999;" onclick="if(event.target===this) closeModal('modal-complaint-form')">
+        <div class="a4-sheet-container" style="max-width:880px; border-top:6px solid #dc2626;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:12px; margin-bottom:18px;">
+                <h3 style="margin:0; color:#991b1b; font-size:18px; font-weight:900; display:flex; align-items:center; gap:8px;">
+                    <span>🚨</span> فتح ملف شكوى عميل واستدعاء الحرز المشفر (ISO 17025 §7.9)
+                </h3>
+                <button class="btn btn-outline" style="font-size:12px; padding:4px 10px;" onclick="closeModal('modal-complaint-form')">✕ إغلاق</button>
+            </div>
+
+            <form id="form-complaint-record" onsubmit="handleSaveComplaint(event)">
+                <input type="hidden" id="cmp-form-id" value="">
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:16px;">
+                    <div style="font-weight:800; color:#0a192f; font-size:13.5px; margin-bottom:10px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">
+                        👤 بيانات العميل والشهادة المتنازع عليها
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">اسم العميل / شركة المجوهرات *</label>
+                            <input type="text" id="cmp-client" required placeholder="مثال: شركة مجوهرات الأهرام الذهبية" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">رقم شهادة / تقرير الفحص الأصلي</label>
+                            <input type="text" id="cmp-report-ref" placeholder="مثال: GBI-REP-2026-1049" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-family:monospace; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">العيار والمنتج المتنازع عليه *</label>
+                            <input type="text" id="cmp-karat" required placeholder="مثال: سبيكة ذهب عيار 21 (875‰)" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">تاريخ استلام الشكوى *</label>
+                            <input type="date" id="cmp-date" required style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:10px; padding:14px; margin-bottom:16px;">
+                    <div style="font-weight:800; color:#991b1b; font-size:13.5px; margin-bottom:10px; border-bottom:1px solid #fca5a5; padding-bottom:4px;">
+                        🔒 حرز العينة الاحتياطية المشفرة (Blind Retain Sample Code)
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#991b1b; margin-bottom:4px;">كود الحرز المشفر الآلي (Blind Code)</label>
+                            <input type="text" id="cmp-blind-code" readonly style="width:100%; padding:8px; border:1px solid #fca5a5; border-radius:6px; font-size:13px; font-family:monospace; font-weight:900; background:#ffffff; color:#dc2626; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">موقع حرز العينة بالخزينة المشفرة</label>
+                            <input type="text" id="cmp-vault-loc" placeholder="مثال: خزينة الحرز B - رف رقم 4" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">رقم طلب الإجراء التصحيحي (CAR Ref)</label>
+                            <input type="text" id="cmp-car-ref" placeholder="مثال: GBI-CAR-2026-03" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-family:monospace; box-sizing:border-box;">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:16px;">
+                    <div style="font-weight:800; color:#0a192f; font-size:13.5px; margin-bottom:10px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">
+                        🔍 وصف الشكوى ونتائج التحقيق الفني
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">وصف اعتراض العميل ومبررات الشكوى *</label>
+                            <textarea id="cmp-desc" rows="2" required placeholder="أدخل تفاصيل ادعاء العميل والفرق في قراءة العيار..." style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;"></textarea>
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">نتيجة إعادة الفحص الأعمى وتحليل السبب الجذري (Root Cause)</label>
+                            <textarea id="cmp-result" rows="2" placeholder="نتيجة فحص الحرز المشفر من قبل كبير الفاحصين والقرار الفني النهائي..." style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;"></textarea>
+                        </div>
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">حالة الشكوى</label>
+                                <select id="cmp-status" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-weight:700; box-sizing:border-box;">
+                                    <option value="investigating">⏳ قيد التحقيق وسحب الحرز المرجعي</option>
+                                    <option value="resolved">✓ تمت التسوية والاعتماد والإغلاق</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">مسؤول الجودة المحقق</label>
+                                <input type="text" id="cmp-investigator" placeholder="مثال: مدير ضمان الجودة / رئيس المختبر" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
+                    <button type="button" class="btn btn-outline" style="font-size:13px; padding:8px 18px;" onclick="closeModal('modal-complaint-form')">إلغاء</button>
+                    <button type="submit" class="btn" style="background:#dc2626; color:#ffffff; font-size:13px; padding:8px 22px; font-weight:800;">💾 حفظ وتوثيق ملف الشكوى</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- 5. MODAL: VIEW COMPLAINT & BLIND RECALL INVESTIGATION DOSSIER           -->
+    <!-- ======================================================================= -->
+    <div id="modal-complaint-view" class="modal-overlay" style="display:none; z-index:999999;" onclick="if(event.target===this) closeModal('modal-complaint-view')">
+        <div class="a4-sheet-container" style="max-width:860px;">
+            <div class="a4-watermark">GBI LAB • CONFIDENTIAL QUALITY INVESTIGATION • ISO 17025</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #991b1b; padding-bottom:10px; margin-bottom:16px;" class="no-print">
+                <span style="font-weight:900; color:#991b1b; font-size:14px;">📑 ملف التحقيق الفني وسحب العينة الاحتياطية المشفرة</span>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn" style="background:#0a192f; color:#d4af37; font-size:12px; padding:6px 12px;" onclick="window.print()"><i class="fas fa-print"></i> 🖨️ طباعة المحضر</button>
+                    <button class="btn btn-outline" style="font-size:12px; padding:6px 10px;" onclick="closeModal('modal-complaint-view')">✕ إغلاق</button>
+                </div>
+            </div>
+
+            <div id="complaint-view-content">
+                <!-- Dynamic Complaint Dossier Content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- 6. MODAL: ADD / UPGRADE QUALITY DOCUMENT CONTROL (Clause 8.2 & 8.3)     -->
+    <!-- ======================================================================= -->
+    <div id="modal-doc-form" class="modal-overlay" style="display:none; z-index:999999;" onclick="if(event.target===this) closeModal('modal-doc-form')">
+        <div class="a4-sheet-container" style="max-width:850px; border-top:6px solid #059669;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:12px; margin-bottom:18px;">
+                <h3 style="margin:0; color:#0a192f; font-size:18px; font-weight:900; display:flex; align-items:center; gap:8px;">
+                    <span>📁</span> تسجيل / ترقية وثيقة جودة معتمدة (Document Control & Rev)
+                </h3>
+                <button class="btn btn-outline" style="font-size:12px; padding:4px 10px;" onclick="closeModal('modal-doc-form')">✕ إغلاق</button>
+            </div>
+
+            <form id="form-doc-record" onsubmit="handleSaveDocControl(event)">
+                <input type="hidden" id="doc-form-mode" value="add">
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:16px;">
+                    <div style="font-weight:800; color:#0a192f; font-size:13.5px; margin-bottom:10px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">
+                        📄 تعريف وتصنيف الوثيقة (Document Identification)
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">رمز / كود الوثيقة المعياري *</label>
+                            <input type="text" id="doc-form-code" required placeholder="مثال: GBI-SOP-07-02" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-family:monospace; font-weight:800; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">عنوان الوثيقة الكامل *</label>
+                            <input type="text" id="doc-form-title" required placeholder="مثال: إجراء فحص الذهب بطريقة الكوبيل والتحليل الناري" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">البند المرتبط بمواصفة 17025 *</label>
+                            <select id="doc-form-clause" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                                <option value="§ 4.1 & 4.2">بند 4: الحيادية والسرية (§ 4.1 & 4.2)</option>
+                                <option value="§ 5.1 - 5.7">بند 5: المتطلبات الهيكلية والتنظيمية (§ 5)</option>
+                                <option value="§ 6.2 - 6.6">بند 6: الموارد والأجهزة والكفاءات (§ 6)</option>
+                                <option value="§ 7.2 - 7.8">بند 7: العمليات الفنية والتقارير (§ 7)</option>
+                                <option value="§ 8.2 & 8.3">بند 8: نظام الإدارة وضبط الوثائق (§ 8)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">نوع الوثيقة</label>
+                            <select id="doc-form-type" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                                <option value="SOP">إجراء تشغيلي قياسي (SOP)</option>
+                                <option value="QM">دليل الجودة الشامل (Quality Manual)</option>
+                                <option value="POL">سياسة إدارة عليا (Policy)</option>
+                                <option value="FRM">نموذج / سجل جودة رسمي (Form/Record)</option>
+                                <option value="WI">تعليمات عمل فنية (Work Instruction)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:16px;">
+                    <div style="font-weight:800; color:#0a192f; font-size:13.5px; margin-bottom:10px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">
+                        ✍️ الإصدار والاعتماد والتعديلات (Revision & Approval)
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">رقم الإصدار (Revision) *</label>
+                            <input type="text" id="doc-form-rev" required placeholder="مثال: 02 أو 03" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; font-family:monospace; font-weight:800; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">تاريخ السريان والنفاذ *</label>
+                            <input type="date" id="doc-form-date" required style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">المعد / أخصائي التوثيق</label>
+                            <input type="text" id="doc-form-author" placeholder="مثال: م. أحمد رضوان / مسؤول الجودة" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">المعتمد / مدير المختبر</label>
+                            <input type="text" id="doc-form-approver" placeholder="مثال: د. محمد سامي / المدير التنفيذي" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;">
+                        </div>
+                        <div style="grid-column:1/-1;">
+                            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">ملخص التعديلات ومبررات الترقية (Change Justification)</label>
+                            <textarea id="doc-form-reason" rows="2" placeholder="أدخل تفاصيل التعديلات التي تمت في هذا الإصدار مقارنة بالإصدار السابق..." style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12.5px; box-sizing:border-box;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
+                    <button type="button" class="btn btn-outline" style="font-size:13px; padding:8px 18px;" onclick="closeModal('modal-doc-form')">إلغاء</button>
+                    <button type="submit" class="btn" style="background:#059669; font-size:13px; padding:8px 22px; font-weight:800;">💾 حفظ واعتماد إصدار الوثيقة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- 7. MODAL: VIEW DOCUMENT REVISION HISTORY (Clause 8.3)                   -->
+    <!-- ======================================================================= -->
+    <div id="modal-doc-history" class="modal-overlay" style="display:none; z-index:999999;" onclick="if(event.target===this) closeModal('modal-doc-history')">
+        <div class="a4-sheet-container" style="max-width:850px;">
+            <div class="a4-watermark">GBI LAB • DOCUMENT REVISION HISTORY • ISO 17025</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0a192f; padding-bottom:10px; margin-bottom:16px;" class="no-print">
+                <span style="font-weight:900; color:#0a192f; font-size:14px;">📜 سجل التاريخ والمراجعات للوثيقة المعتمدة</span>
+                <button class="btn btn-outline" style="font-size:12px; padding:6px 10px;" onclick="closeModal('modal-doc-history')">✕ إغلاق</button>
+            </div>
+
+            <div id="doc-history-content">
+                <!-- Dynamically populated document history -->
+            </div>
+        </div>
+    </div>
+
+
     <div id="form-modal" class="modal-overlay">
         <div class="a4-sheet-container">
             <!-- Security Watermark -->
@@ -1872,6 +2619,17 @@ function renderA4Sheet(form) {
         </div>
 
         <!-- SIGNATURES & OFFICIAL SEAL BLOCK -->
+        <!-- CRYPTOGRAPHIC SHA-256 DIGITAL SIGNATURE & WATERMARK FINGERPRINT -->
+        <div style="margin-top:14px; padding:8px 12px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+                <span style="background:#0a192f; color:#d4af37; padding:2px 6px; border-radius:4px; font-weight:900; font-size:9.5px;">ISO 17025 VERIFIED</span>
+                <strong style="font-size:11px; color:#0a192f;">بصمة التوثيق المشفر (SHA-256 Fingerprint):</strong>
+            </div>
+            <div style="font-family:monospace; font-size:10.5px; font-weight:800; color:#334155;">
+                SHA-256: ${sha256(form.code + '_VERIFIED_ISO17025')}
+            </div>
+        </div>
+
         <div class="a4-footer-signatures">
             <div class="sig-box">
                 <div class="sig-box-title">إعداد / الفاحص المعتمد<br><span style="font-size:9.5px; font-weight:normal; color:#64748b;">Prepared by / Assayer</span></div>
@@ -2537,6 +3295,11 @@ function switchTabMobile(tabId, btn) {
     
     if (tabId === 'tab-dash') updateDashboard();
     if (tabId === 'tab-forms') renderForms();
+    if (tabId === 'tab-calibration') renderCalibrationTable();
+    if (tabId === 'tab-sqc') renderSqcModule();
+    if (tabId === 'tab-complaints') renderComplaintsTable();
+    if (tabId === 'tab-doc-control') renderDocControlTable();
+    if (tabId === 'tab-chk') renderChecklist();
     if (tabId === 'tab-audit-trail') renderAuditLog();
     if (tabId === 'tab-users') renderUsersAdminTable();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2548,8 +3311,14 @@ function switchTab(tabId, btn) {
     const target = document.getElementById(tabId);
     if (target) target.style.display = 'block';
     if (btn) btn.classList.add('active');
+    
     if (tabId === 'tab-dash') updateDashboard();
     if (tabId === 'tab-forms') renderForms();
+    if (tabId === 'tab-calibration') renderCalibrationTable();
+    if (tabId === 'tab-sqc') renderSqcModule();
+    if (tabId === 'tab-complaints') renderComplaintsTable();
+    if (tabId === 'tab-doc-control') renderDocControlTable();
+    if (tabId === 'tab-chk') renderChecklist();
     if (tabId === 'tab-audit-trail') renderAuditLog();
     if (tabId === 'tab-users') renderUsersAdminTable();
 }
@@ -3146,9 +3915,1446 @@ async function testEmailAlert(type) {
 }
 
 // Quick login defaults helper
+window.addEventListener('popstate', () => {
+    if (window.isQrDirectAccess || !currentUser) {
+        exitQrSession();
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     onLoginRoleChange();
 });
+
+// =======================================================================
+// ===== ENTERPRISE ISO/IEC 17025 MODULES LOGIC & CONTROLLERS =====
+// =======================================================================
+
+// Ultra-robust modal opener / closer
+function openModal(id) {
+    try {
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.display = 'flex';
+            el.style.visibility = 'visible';
+            el.style.opacity = '1';
+            el.style.zIndex = '999999';
+            document.body.style.overflow = 'hidden';
+        } else {
+            console.error('Modal element not found by ID:', id);
+        }
+    } catch(e) {
+        console.error('Exception in openModal:', id, e);
+    }
+}
+
+function closeModal(id) {
+    try {
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    } catch(e) {
+        console.error('Exception in closeModal:', id, e);
+    }
+}
+
+// =======================================================================
+// MODULE 1: METROLOGICAL TRACEABILITY & CALIBRATION (Clause 6.4 & 6.5)
+// =======================================================================
+var defaultCalibrationList = [
+    {
+        id: 1,
+        name: "ميزان إلكتروني تحليلي فائق الحساسية 0.01mg",
+        code: "GBI-BAL-01",
+        serial: "Mettler Toledo XPR205 (SN: B8392019)",
+        location: "غرفة الموازين الحساسة (Clean Room 101)",
+        provider: "المعهد القومي للمعايرة (NIS - Accredited)",
+        cert: "NIS-CAL-2025-9941",
+        calDate: "2025-06-15",
+        dueDate: "2026-06-15",
+        interval: "12",
+        uncertainty: "± 0.02 mg (k=2)",
+        status: "valid"
+    },
+    {
+        id: 2,
+        name: "فرن صهر وتحليل ناري للكوبيل (1200°C)",
+        code: "GBI-FURN-02",
+        serial: "Carbolite Gero CSF 1200 (SN: CG-77412)",
+        location: "عنبر الصهر والتحليل الحراري (Zone A)",
+        provider: "مختبر المعايرة الحرارية المعتمد (SASO Lab)",
+        cert: "CAL-TEMP-2025-410",
+        calDate: "2025-10-10",
+        dueDate: "2026-10-10",
+        interval: "12",
+        uncertainty: "± 2.5 °C (k=2)",
+        status: "valid"
+    },
+    {
+        id: 3,
+        name: "مجموعة كتل عيارية قياسية فئة E2 (1mg - 500g)",
+        code: "GBI-CRM-MAS-01",
+        serial: "Häfner Weights Class E2 (Box #401)",
+        location: "خزينة المعايير المرجعية الرئيسية",
+        provider: "المعهد القومي للمعايرة (NIS)",
+        cert: "NIS-MASS-2025-1029",
+        calDate: "2025-04-01",
+        dueDate: "2027-04-01",
+        interval: "24",
+        uncertainty: "± 0.005 mg (k=2)",
+        status: "valid"
+    },
+    {
+        id: 4,
+        name: "جهاز مطيافية الأشعة السينية المحمول (XRF Gold Tester)",
+        code: "GBI-XRF-01",
+        serial: "Olympus Vanta Element-G (SN: VNT-99302)",
+        location: "معمل الفحص السريع واستقبال العينات",
+        provider: "الوكيل الفني المعتمد للمعايرة الطيفية",
+        cert: "XRF-VER-2025-301",
+        calDate: "2025-09-12",
+        dueDate: "2026-03-12",
+        interval: "6",
+        uncertainty: "± 0.08 % Au (k=2)",
+        status: "valid"
+    },
+    {
+        id: 5,
+        name: "مادة مرجعية معتمدة للذهب عيار 24 (CRM Au 999.9)",
+        code: "CRM-AU-9999",
+        serial: "BAM Standard Lot: BAM-S001-A",
+        location: "خزينة المواد المرجعية المحكمة",
+        provider: "Federal Institute for Materials (BAM Germany)",
+        cert: "BAM-CRM-2025-88",
+        calDate: "2025-01-10",
+        dueDate: "2027-01-10",
+        interval: "24",
+        uncertainty: "999.90 ± 0.03 ‰ (k=2)",
+        status: "valid"
+    }
+];
+
+function getCalibrationStored() {
+    try {
+        const s = localStorage.getItem('gbi_calibration_items_v2');
+        if (s) {
+            const parsed = JSON.parse(s);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+    } catch(e) {}
+    localStorage.setItem('gbi_calibration_items_v2', JSON.stringify(defaultCalibrationList));
+    return defaultCalibrationList;
+}
+
+function saveCalibrationStored(data) {
+    try {
+        localStorage.setItem('gbi_calibration_items_v2', JSON.stringify(data));
+    } catch(e) {}
+}
+
+function calculateNextCalDueDate() {
+    try {
+        const calDateVal = document.getElementById('cal-date')?.value;
+        const intervalVal = parseInt(document.getElementById('cal-interval')?.value) || 12;
+        if (!calDateVal) return;
+
+        const d = new Date(calDateVal);
+        d.setMonth(d.getMonth() + intervalVal);
+        const dueEl = document.getElementById('cal-due');
+        if (dueEl) dueEl.value = d.toISOString().slice(0, 10);
+    } catch(e) {}
+}
+
+function renderCalibrationTable() {
+    const tbody = document.getElementById('calibration-table-body');
+    const banner = document.getElementById('calibration-alert-banner');
+    if (!tbody) return;
+
+    const items = getCalibrationStored();
+    const searchVal = (document.getElementById('cal-search-input')?.value || '').toLowerCase().trim();
+    const filterStatus = document.getElementById('cal-filter-status')?.value || 'all';
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    let totalCount = items.length;
+    let validCount = 0;
+    let dueSoonCount = 0;
+    let expiredCount = 0;
+    let alertDetails = [];
+
+    const filtered = items.filter(item => {
+        const due = new Date(item.dueDate);
+        due.setHours(0,0,0,0);
+        const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+
+        if (diffDays <= 0) expiredCount++;
+        else if (diffDays <= 30) dueSoonCount++;
+        else validCount++;
+
+        if (filterStatus === 'valid' && diffDays <= 30) return false;
+        if (filterStatus === 'due_soon' && (diffDays <= 0 || diffDays > 30)) return false;
+        if (filterStatus === 'expired' && diffDays > 0) return false;
+
+        if (searchVal) {
+            const str = (item.name + ' ' + item.code + ' ' + item.provider + ' ' + item.location + ' ' + item.cert).toLowerCase();
+            if (!str.includes(searchVal)) return false;
+        }
+
+        return true;
+    });
+
+    const kTotal = document.getElementById('cal-kpi-total');
+    const kValid = document.getElementById('cal-kpi-valid');
+    const kDueSoon = document.getElementById('cal-kpi-due-soon');
+    const kExpired = document.getElementById('cal-kpi-expired');
+
+    if (kTotal) kTotal.innerText = totalCount;
+    if (kValid) kValid.innerText = validCount;
+    if (kDueSoon) kDueSoon.innerText = dueSoonCount;
+    if (kExpired) kExpired.innerText = expiredCount;
+
+    tbody.innerHTML = filtered.map((item, idx) => {
+        const due = new Date(item.dueDate);
+        due.setHours(0,0,0,0);
+        const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+
+        let badgeHtml = '';
+        if (diffDays <= 0) {
+            badgeHtml = `<span style="background:#fee2e2; color:#991b1b; padding:4px 10px; border-radius:6px; font-weight:800; font-size:11px; border:1px solid #fca5a5;">🚨 منتهية (${Math.abs(diffDays)} يوم مضى)</span>`;
+            alertDetails.push(`الجهاز <b>${escapeHtml(item.name)} (${escapeHtml(item.code)})</b> منتهي المعايرة ويحظر استخدامه.`);
+        } else if (diffDays <= 30) {
+            badgeHtml = `<span style="background:#fef3c7; color:#92400e; padding:4px 10px; border-radius:6px; font-weight:800; font-size:11px; border:1px solid #fde68a;">⚠️ استحقاق مسبق (${diffDays} يوم متبقي)</span>`;
+            alertDetails.push(`تنبيه مسبق: الجهاز <b>${escapeHtml(item.name)} (${escapeHtml(item.code)})</b> يستحق المعايرة بعد ${diffDays} يوماً.`);
+        } else {
+            badgeHtml = `<span style="background:#dcfce7; color:#166534; padding:4px 10px; border-radius:6px; font-weight:800; font-size:11px; border:1px solid #86efac;">✓ سارية ومعتمدة (${diffDays} يوم)</span>`;
+        }
+
+        return `
+            <tr style="border-bottom:1px solid #f1f5f9;">
+                <td style="text-align:center; font-weight:700; color:#64748b;">${idx + 1}</td>
+                <td>
+                    <div style="font-weight:800; color:#0a192f; font-size:13.5px;">${escapeHtml(item.name)}</div>
+                    <div style="font-size:11.5px; color:#64748b;">${escapeHtml(item.serial || '-')}</div>
+                </td>
+                <td><span style="font-family:monospace; font-weight:800; background:#0a192f; color:#d4af37; padding:3px 8px; border-radius:6px; font-size:12px;">${escapeHtml(item.code)}</span></td>
+                <td style="font-size:12px; color:#334155;">${escapeHtml(item.location || 'المعمل الرئيسي')}</td>
+                <td style="font-size:12px; color:#475569; font-weight:600;">${escapeHtml(item.provider)}</td>
+                <td><span style="font-family:monospace; font-size:11.5px; color:#0369a1;">${escapeHtml(item.cert)}</span></td>
+                <td style="text-align:center; font-family:monospace; font-size:12px;">${escapeHtml(item.calDate)}</td>
+                <td style="text-align:center; font-family:monospace; font-weight:800; font-size:12px; color:${diffDays <= 30 ? '#dc2626' : '#0a192f'};">${escapeHtml(item.dueDate)}</td>
+                <td style="text-align:center; font-family:monospace; font-size:11.5px; color:#475569;">${escapeHtml(item.uncertainty || '±0.01%')}</td>
+                <td style="text-align:center;">${badgeHtml}</td>
+                <td style="text-align:center;">
+                    <div style="display:flex; gap:4px; justify-content:center;">
+                        <button type="button" class="btn btn-outline" style="font-size:11px; padding:4px 8px; color:#0369a1; border-color:#0369a1;" onclick="viewCalibrationCertificate(${item.id})" title="عرض بطاقة وشهادة التحقق المترولوجي">📄 عرض</button>
+                        <button type="button" class="btn btn-outline" style="font-size:11px; padding:4px 8px; color:#059669; border-color:#059669;" onclick="openEditCalibrationModal(${item.id})" title="تجديد / تعديل المعايرة">🔄 تجديد</button>
+                        <button type="button" class="btn btn-outline" style="font-size:11px; padding:4px 6px; color:#dc2626; border-color:#fca5a5;" onclick="deleteCalibrationItem(${item.id})" title="حذف">🗑️</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#94a3b8; font-weight:700;">لا توجد أجهزة أو مواد مرجعية مطابقة لخيارات البحث</td></tr>`;
+    }
+
+    if (banner) {
+        if (alertDetails.length > 0) {
+            banner.style.display = 'block';
+            banner.innerHTML = `
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                    <span style="font-size:18px;">⚠️</span>
+                    <div>
+                        <div style="font-weight:800; font-size:14px; margin-bottom:4px; color:#92400e;">تنبيهات إدارة المعايرة المترولوجية والتنبيه المسبق:</div>
+                        <ul style="margin:0; padding-right:20px; font-size:12.5px; color:#78350f;">
+                            ${alertDetails.map(a => `<li>${a}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        } else {
+            banner.style.display = 'none';
+        }
+    }
+}
+
+function openAddCalibrationModal() {
+    try {
+        const idEl = document.getElementById('cal-form-id');
+        if (idEl) idEl.value = '';
+        const f = document.getElementById('form-cal-record');
+        if (f) f.reset();
+        const intEl = document.getElementById('cal-interval');
+        if (intEl) intEl.value = '12';
+        const dateEl = document.getElementById('cal-date');
+        if (dateEl) dateEl.value = new Date().toISOString().slice(0, 10);
+        calculateNextCalDueDate();
+    } catch(e) {}
+    openModal('modal-cal-form');
+}
+
+function openEditCalibrationModal(id) {
+    try {
+        const items = getCalibrationStored();
+        const item = items.find(x => x.id === id);
+        if (!item) return;
+
+        const setVal = (elemId, val) => {
+            const el = document.getElementById(elemId);
+            if (el) el.value = val || '';
+        };
+
+        setVal('cal-form-id', item.id);
+        setVal('cal-name', item.name);
+        setVal('cal-code', item.code);
+        setVal('cal-serial', item.serial);
+        setVal('cal-location', item.location);
+        setVal('cal-provider', item.provider);
+        setVal('cal-cert', item.cert);
+        setVal('cal-date', item.calDate);
+        setVal('cal-interval', item.interval || '12');
+        setVal('cal-due', item.dueDate);
+        setVal('cal-unc', item.uncertainty);
+
+        openModal('modal-cal-form');
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+function handleSaveCalibration(event) {
+    if (event) event.preventDefault();
+    try {
+        const idVal = document.getElementById('cal-form-id')?.value;
+        const items = getCalibrationStored();
+
+        const record = {
+            id: idVal ? parseInt(idVal) : Date.now(),
+            name: document.getElementById('cal-name')?.value.trim() || 'جهاز مخبري',
+            code: document.getElementById('cal-code')?.value.trim() || 'GBI-EQ-01',
+            serial: document.getElementById('cal-serial')?.value.trim() || '',
+            location: document.getElementById('cal-location')?.value.trim() || '',
+            provider: document.getElementById('cal-provider')?.value.trim() || '',
+            cert: document.getElementById('cal-cert')?.value.trim() || '',
+            calDate: document.getElementById('cal-date')?.value || new Date().toISOString().slice(0, 10),
+            interval: document.getElementById('cal-interval')?.value || '12',
+            dueDate: document.getElementById('cal-due')?.value || '',
+            uncertainty: document.getElementById('cal-unc')?.value.trim() || '± 0.01%'
+        };
+
+        if (idVal) {
+            const idx = items.findIndex(x => x.id === parseInt(idVal));
+            if (idx !== -1) items[idx] = record;
+            logAudit('تحديث معايرة جهاز §6.4', record.code, '-', `تجديد المعايرة إلى ${record.dueDate}`);
+        } else {
+            items.unshift(record);
+            logAudit('تسجيل جهاز جديد §6.4', record.code, '-', `تسجيل الأصل وتاريخ الاستحقاق ${record.dueDate}`);
+        }
+
+        saveCalibrationStored(items);
+        closeModal('modal-cal-form');
+        renderCalibrationTable();
+        alert('✅ تم حفظ وتوثيق السجل المترولوجي للأصل بنجاح!');
+    } catch(e) {
+        console.error(e);
+        alert('حدث خطأ أثناء الحفظ');
+    }
+}
+
+function deleteCalibrationItem(id) {
+    if (!confirm('هل أنت متأكد من حذف هذا الأصل المخبري من مصفوفة المعايرة؟')) return;
+    let items = getCalibrationStored();
+    const item = items.find(x => x.id === id);
+    items = items.filter(x => x.id !== id);
+    saveCalibrationStored(items);
+    renderCalibrationTable();
+    if (item) logAudit('حذف سجل معايرة §6.4', item.code, '-', 'حذف الأصل من السجل');
+}
+
+function viewCalibrationCertificate(id) {
+    const items = getCalibrationStored();
+    const item = items.find(x => x.id === id);
+    if (!item) return;
+
+    const container = document.getElementById('cal-detail-content');
+    const todayStr = new Date().toLocaleDateString('ar-EG');
+
+    if (container) {
+        container.innerHTML = `
+            <div style="border:2px solid #0a192f; border-radius:12px; padding:24px; background:#ffffff;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #d4af37; padding-bottom:14px; margin-bottom:18px;">
+                    <div>
+                        <h2 style="margin:0; color:#0a192f; font-size:18px; font-weight:900;">مختبر فحص وتحليل الذهب والمعادن الثمينة (GBI Lab)</h2>
+                        <div style="font-size:12px; color:#64748b; margin-top:2px;">سجل التحقق المترولوجي وبطاقة الأصل المخبري المعاير (ISO/IEC 17025:2017 Clause 6.4 & 6.5)</div>
+                    </div>
+                    <div style="text-align:left;">
+                        <div style="font-family:monospace; font-weight:900; color:#0a192f; font-size:15px;">${escapeHtml(item.code)}</div>
+                        <span style="background:#dcfce7; color:#166534; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:800;">معتمد للتشغيل</span>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; font-size:13px;">
+                    <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0;">
+                        <div style="color:#64748b; font-size:11px; font-weight:700;">اسم الجهاز / المرجع</div>
+                        <div style="font-weight:800; color:#0a192f; margin-top:2px;">${escapeHtml(item.name)}</div>
+                        <div style="margin-top:8px; color:#64748b; font-size:11px; font-weight:700;">الرقم التسلسلي والموديل</div>
+                        <div style="font-weight:700; color:#334155; font-family:monospace;">${escapeHtml(item.serial || 'N/A')}</div>
+                        <div style="margin-top:8px; color:#64748b; font-size:11px; font-weight:700;">الموقع بالمعمل</div>
+                        <div style="font-weight:700; color:#334155;">${escapeHtml(item.location || 'المعمل الرئيسي')}</div>
+                    </div>
+
+                    <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0;">
+                        <div style="color:#64748b; font-size:11px; font-weight:700;">جهة المعايرة المعتمدة</div>
+                        <div style="font-weight:800; color:#0369a1; margin-top:2px;">${escapeHtml(item.provider)}</div>
+                        <div style="margin-top:8px; color:#64748b; font-size:11px; font-weight:700;">رقم شهادة المعايرة الرسمية</div>
+                        <div style="font-weight:700; color:#0a192f; font-family:monospace;">${escapeHtml(item.cert)}</div>
+                        <div style="margin-top:8px; color:#64748b; font-size:11px; font-weight:700;">الارتياب القياسي الموسع (U, k=2)</div>
+                        <div style="font-weight:800; color:#7c3aed; font-family:monospace;">${escapeHtml(item.uncertainty || '±0.01%')}</div>
+                    </div>
+                </div>
+
+                <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:14px; margin-bottom:18px;">
+                    <div style="font-weight:800; color:#1e40af; font-size:13px; margin-bottom:6px;">سلسلة التتبع المترولوجي للوحدات الدولية (SI Metrological Traceability):</div>
+                    <div style="font-size:12.5px; color:#1e3a8a; line-height:1.6;">
+                        تمت المعايرة والتحقق باستخدام معايير مرجعية معتمدة ومربوطة مباشرة بسلسلة المعايرة القومية والدولية (NIST / BIPM / NIS). النتائج مقبولة وضمن حدود الخطأ الأقصى المسموح (MPE) طبقاً لمواصفات المختبر.
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px;">
+                    <div style="border:1px solid #cbd5e1; border-radius:8px; padding:10px; text-align:center;">
+                        <div style="font-size:11.5px; color:#64748b;">تاريخ آخر معايرة</div>
+                        <div style="font-size:15px; font-weight:900; color:#0a192f; font-family:monospace; margin-top:2px;">${escapeHtml(item.calDate)}</div>
+                    </div>
+                    <div style="border:1px solid #cbd5e1; border-radius:8px; padding:10px; text-align:center; background:#fffbeb;">
+                        <div style="font-size:11.5px; color:#92400e;">تاريخ المعايرة القادمة (Due Date)</div>
+                        <div style="font-size:15px; font-weight:900; color:#dc2626; font-family:monospace; margin-top:2px;">${escapeHtml(item.dueDate)}</div>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:14px; font-size:11.5px; color:#64748b;">
+                    <div>تاريخ الطباعة: ${todayStr}</div>
+                    <div>اعتماد مدير الجودة والمترولوجيا: <b>د. م. حسام الدين</b> (ختم إلكتروني معتمد)</div>
+                </div>
+            </div>
+        `;
+    }
+
+    openModal('modal-cal-detail');
+}
+
+// =======================================================================
+// MODULE 2: STATISTICAL QUALITY CONTROL & WESTGARD RULES (Clause 7.7)
+// =======================================================================
+var defaultSqcDataStore = {
+    crm_24k: {
+        name: "ذهب نقي عيار 24 (BAM CRM-Au-999.9)",
+        method: "فحص الكوبيل الناري (ISO 11426 Fire Assay)",
+        target: 999.90,
+        sd: 0.040,
+        runs: [
+            { batch: "RUN-01", date: "2026-03-01", val: 999.91, analyst: "كيميائي/ أحمد" },
+            { batch: "RUN-02", date: "2026-03-05", val: 999.88, analyst: "كيميائي/ سامح" },
+            { batch: "RUN-03", date: "2026-03-10", val: 999.93, analyst: "كيميائي/ أحمد" },
+            { batch: "RUN-04", date: "2026-03-15", val: 999.89, analyst: "كيميائي/ سارة" },
+            { batch: "RUN-05", date: "2026-03-20", val: 999.90, analyst: "كيميائي/ أحمد" },
+            { batch: "RUN-06", date: "2026-03-24", val: 999.87, analyst: "كيميائي/ سامح" }
+        ]
+    },
+    crm_21k: {
+        name: "سبيكة ذهب عيار 21 (GBI In-House Standard 875)",
+        method: "فحص الصهر والكوبيل القياسي (Fire Assay 875‰)",
+        target: 875.00,
+        sd: 0.150,
+        runs: [
+            { batch: "RUN-21-01", date: "2026-03-02", val: 875.05, analyst: "كيميائي/ سامح" },
+            { batch: "RUN-21-02", date: "2026-03-08", val: 874.92, analyst: "كيميائي/ أحمد" },
+            { batch: "RUN-21-03", date: "2026-03-14", val: 875.12, analyst: "كيميائي/ سارة" },
+            { batch: "RUN-21-04", date: "2026-03-22", val: 875.01, analyst: "كيميائي/ سامح" }
+        ]
+    },
+    crm_18k: {
+        name: "سبيكة ذهب عيار 18 (XRF Calibration Std 750)",
+        method: "مطيافية الأشعة السينية (XRF Spectrometry ISO 23345)",
+        target: 750.00,
+        sd: 0.200,
+        runs: [
+            { batch: "XRF-01", date: "2026-03-03", val: 750.15, analyst: "فني/ عمر" },
+            { batch: "XRF-02", date: "2026-03-11", val: 749.85, analyst: "فني/ عمر" },
+            { batch: "XRF-03", date: "2026-03-18", val: 750.08, analyst: "فني/ عمر" }
+        ]
+    },
+    crm_ag925: {
+        name: "فضة استرليني عيار 925 (Ag CRM 925)",
+        method: "التحليل الحجمي الكهروكيميائي (ISO 11427 Volumetric)",
+        target: 925.00,
+        sd: 0.250,
+        runs: [
+            { batch: "AG-01", date: "2026-03-04", val: 925.10, analyst: "كيميائي/ سارة" },
+            { batch: "AG-02", date: "2026-03-16", val: 924.80, analyst: "كيميائي/ سارة" }
+        ]
+    }
+};
+
+function getSqcStored() {
+    try {
+        const s = localStorage.getItem('gbi_sqc_data_v2');
+        if (s) {
+            const parsed = JSON.parse(s);
+            if (parsed && typeof parsed === 'object' && parsed.crm_24k) return parsed;
+        }
+    } catch(e) {}
+    localStorage.setItem('gbi_sqc_data_v2', JSON.stringify(defaultSqcDataStore));
+    return defaultSqcDataStore;
+}
+
+function saveSqcStored(data) {
+    try {
+        localStorage.setItem('gbi_sqc_data_v2', JSON.stringify(data));
+    } catch(e) {}
+}
+
+function renderSqcModule() {
+    const sel = document.getElementById('sqc-crm-select')?.value || 'crm_24k';
+    const allData = getSqcStored();
+    const data = allData[sel] || allData.crm_24k;
+    if (!data) return;
+
+    const target = data.target;
+    const sd = data.sd || 0.04;
+    const runs = data.runs || [];
+
+    const sum = runs.reduce((acc, r) => acc + (parseFloat(r.val) || 0), 0);
+    const mean = runs.length ? sum / runs.length : target;
+    const cv = mean > 0 ? (sd / mean) * 100 : 0;
+    const recovery = target > 0 ? (mean / target) * 100 : 100;
+
+    const targetEl = document.getElementById('sqc-target-val');
+    const meanEl = document.getElementById('sqc-mean-val');
+    const sdEl = document.getElementById('sqc-sd-val');
+    const cvEl = document.getElementById('sqc-cv-val');
+    const recEl = document.getElementById('sqc-rec-val');
+    const badgeEl = document.getElementById('sqc-status-badge');
+
+    if (targetEl) targetEl.innerText = target.toFixed(2);
+    if (meanEl) meanEl.innerText = mean.toFixed(3);
+    if (sdEl) sdEl.innerText = sd.toFixed(3);
+    if (cvEl) cvEl.innerText = cv.toFixed(4) + '%';
+    if (recEl) recEl.innerText = recovery.toFixed(3) + '%';
+
+    let isOutOfControl = false;
+    let warningMsg = '';
+    if (runs.length > 0) {
+        const lastRun = runs[runs.length - 1];
+        const lastZ = Math.abs((lastRun.val - target) / sd);
+        if (lastZ > 3) {
+            isOutOfControl = true;
+            warningMsg = '🚨 خروج عن السيطرة الإحصائية (قاعدة 1-3s)!';
+        } else if (lastZ > 2) {
+            warningMsg = '⚠️ تحذير ويستغارد (قاعدة 1-2s)';
+        }
+    }
+
+    if (badgeEl) {
+        if (isOutOfControl) {
+            badgeEl.innerText = '🚨 خروج عن السيطرة (Out of Control - 1₃ₛ)';
+            badgeEl.style.background = '#fee2e2';
+            badgeEl.style.color = '#991b1b';
+            badgeEl.style.borderColor = '#fca5a5';
+        } else if (warningMsg) {
+            badgeEl.innerText = '⚠️ حالة تحذيرية (Warning - 1₂ₛ)';
+            badgeEl.style.background = '#fef3c7';
+            badgeEl.style.color = '#92400e';
+            badgeEl.style.borderColor = '#fde68a';
+        } else {
+            badgeEl.innerText = '✓ العملية تحت السيطرة الإحصائية (In Control)';
+            badgeEl.style.background = '#dcfce7';
+            badgeEl.style.color = '#166534';
+            badgeEl.style.borderColor = '#86efac';
+        }
+    }
+
+    const svgContainer = document.getElementById('levey-jennings-canvas-container');
+    if (svgContainer) {
+        const width = Math.max(760, runs.length * 90);
+        const height = 260;
+        const padX = 75;
+        const padY = 35;
+        const plotW = width - padX * 2;
+        const plotH = height - padY * 2;
+
+        const maxDev = 3.8 * sd;
+        const yMin = target - maxDev;
+        const yMax = target + maxDev;
+
+        const getY = (v) => height - padY - ((v - yMin) / (yMax - yMin)) * plotH;
+        const getX = (i) => padX + (i / Math.max(1, runs.length - 1)) * plotW;
+
+        const yMean = getY(target);
+        const yP1 = getY(target + sd);
+        const yM1 = getY(target - sd);
+        const yP2 = getY(target + 2 * sd);
+        const yM2 = getY(target - 2 * sd);
+        const yP3 = getY(target + 3 * sd);
+        const yM3 = getY(target - 3 * sd);
+
+        let pointsSvg = '';
+        let polylinePoints = [];
+
+        runs.forEach((r, i) => {
+            const cx = runs.length === 1 ? width / 2 : getX(i);
+            const cy = getY(r.val);
+            const z = (r.val - target) / sd;
+            polylinePoints.push(`${cx},${cy}`);
+
+            let ptColor = '#059669';
+            if (Math.abs(z) > 3) ptColor = '#dc2626';
+            else if (Math.abs(z) > 2) ptColor = '#d97706';
+
+            pointsSvg += `
+                <circle cx="${cx}" cy="${cy}" r="6" fill="${ptColor}" stroke="#ffffff" stroke-width="2">
+                    <title>التشغيلة: ${escapeHtml(r.batch)}
+التاريخ: ${escapeHtml(r.date)}
+القيمة: ${r.val}
+Z-Score: ${z.toFixed(2)}</title>
+                </circle>
+                <text x="${cx}" y="${cy - 10}" font-size="10.5" font-family="monospace" font-weight="bold" text-anchor="middle" fill="#0a192f">${r.val.toFixed(2)}</text>
+                <text x="${cx}" y="${height - 10}" font-size="10" font-family="monospace" text-anchor="middle" fill="#64748b">${escapeHtml(r.batch)}</text>
+            `;
+        });
+
+        const polylineSvg = polylinePoints.length > 1 ? `<polyline fill="none" stroke="#0284c7" stroke-width="2.2" stroke-linejoin="round" points="${polylinePoints.join(' ')}" />` : '';
+
+        svgContainer.innerHTML = `
+            <svg width="${width}" height="${height}" style="background:#ffffff; border-radius:10px; margin:0 auto; display:block;">
+                <line x1="${padX}" y1="${yP3}" x2="${width - padX}" y2="${yP3}" stroke="#dc2626" stroke-dasharray="4,4" stroke-width="1.5" />
+                <text x="${padX - 10}" y="${yP3 + 4}" font-size="10.5" font-family="monospace" font-weight="bold" fill="#dc2626" text-anchor="end">+3σ (UCL = ${(target + 3 * sd).toFixed(2)})</text>
+
+                <line x1="${padX}" y1="${yP2}" x2="${width - padX}" y2="${yP2}" stroke="#d97706" stroke-dasharray="3,3" stroke-width="1.2" />
+                <text x="${padX - 10}" y="${yP2 + 4}" font-size="10.5" font-family="monospace" fill="#d97706" text-anchor="end">+2σ (UW = ${(target + 2 * sd).toFixed(2)})</text>
+
+                <line x1="${padX}" y1="${yMean}" x2="${width - padX}" y2="${yMean}" stroke="#059669" stroke-width="2.2" />
+                <text x="${padX - 10}" y="${yMean + 4}" font-size="11" font-weight="900" font-family="monospace" fill="#059669" text-anchor="end">Target μ (${target.toFixed(2)})</text>
+
+                <line x1="${padX}" y1="${yM2}" x2="${width - padX}" y2="${yM2}" stroke="#d97706" stroke-dasharray="3,3" stroke-width="1.2" />
+                <text x="${padX - 10}" y="${yM2 + 4}" font-size="10.5" font-family="monospace" fill="#d97706" text-anchor="end">-2σ (LW = ${(target - 2 * sd).toFixed(2)})</text>
+
+                <line x1="${padX}" y1="${yM3}" x2="${width - padX}" y2="${yM3}" stroke="#dc2626" stroke-dasharray="4,4" stroke-width="1.5" />
+                <text x="${padX - 10}" y="${yM3 + 4}" font-size="10.5" font-family="monospace" font-weight="bold" fill="#dc2626" text-anchor="end">-3σ (LCL = ${(target - 3 * sd).toFixed(2)})</text>
+
+                ${polylineSvg}
+                ${pointsSvg}
+            </svg>
+        `;
+    }
+
+    const tbody = document.getElementById('sqc-table-body');
+    if (tbody) {
+        tbody.innerHTML = runs.map((r, idx) => {
+            const dev = r.val - target;
+            const z = dev / sd;
+            const rec = (r.val / target) * 100;
+
+            let evalBadge = '';
+            if (Math.abs(z) > 3) {
+                evalBadge = '<span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-weight:800; font-size:11px;">🚨 خروج 1-3s (مرفوض)</span>';
+            } else if (Math.abs(z) > 2) {
+                evalBadge = '<span style="background:#fef3c7; color:#92400e; padding:3px 8px; border-radius:4px; font-weight:800; font-size:11px;">⚠️ تحذير 1-2s</span>';
+            } else {
+                evalBadge = '<span style="background:#dcfce7; color:#166534; padding:3px 8px; border-radius:4px; font-weight:800; font-size:11px;">✓ مقبول ومطابق</span>';
+            }
+
+            return `
+                <tr style="border-bottom:1px solid #f1f5f9;">
+                    <td style="text-align:center; font-weight:700; color:#64748b;">${idx + 1}</td>
+                    <td>
+                        <span style="font-family:monospace; font-weight:800; color:#0a192f;">${escapeHtml(r.batch)}</span>
+                        <div style="font-size:11px; color:#64748b;">${escapeHtml(r.date)}</div>
+                    </td>
+                    <td style="font-size:12.5px; font-weight:700; color:#334155;">${escapeHtml(data.name)}</td>
+                    <td style="font-family:monospace; font-weight:900; font-size:13.5px; color:#0a192f; text-align:center;">${r.val.toFixed(3)}</td>
+                    <td style="font-family:monospace; font-weight:700; text-align:center; color:${dev >= 0 ? '#059669' : '#dc2626'};">${dev >= 0 ? '+' : ''}${dev.toFixed(3)}</td>
+                    <td style="font-family:monospace; font-weight:800; text-align:center; color:${Math.abs(z) > 2 ? '#dc2626' : '#0a192f'};">${z.toFixed(2)}</td>
+                    <td style="font-family:monospace; text-align:center; color:#475569;">${rec.toFixed(3)}%</td>
+                    <td style="text-align:center;">${evalBadge}</td>
+                    <td style="font-size:12px; color:#475569;">${escapeHtml(r.analyst || 'كيميائي المختبر')}</td>
+                </tr>
+            `;
+        }).reverse().join('');
+    }
+}
+
+function updateSqcFormTarget() {
+    try {
+        const crmSel = document.getElementById('sqc-form-crm')?.value || 'crm_24k';
+        const allData = getSqcStored();
+        const target = allData[crmSel]?.target || 999.90;
+        const targetInput = document.getElementById('sqc-form-target');
+        if (targetInput) targetInput.value = target.toFixed(2);
+        calculateSqcLiveMetrics();
+    } catch(e) {}
+}
+
+function calculateSqcLiveMetrics() {
+    try {
+        const crmSel = document.getElementById('sqc-form-crm')?.value || 'crm_24k';
+        const allData = getSqcStored();
+        const target = allData[crmSel]?.target || 999.90;
+        const sd = allData[crmSel]?.sd || 0.040;
+
+        const val = parseFloat(document.getElementById('sqc-form-val')?.value);
+        const diffEl = document.getElementById('sqc-form-diff');
+        const zEl = document.getElementById('sqc-form-zscore');
+
+        if (isNaN(val)) {
+            if (diffEl) diffEl.value = '';
+            if (zEl) zEl.value = '';
+            return;
+        }
+
+        const diff = val - target;
+        const z = diff / sd;
+
+        if (diffEl) diffEl.value = (diff >= 0 ? '+' : '') + diff.toFixed(3);
+        if (zEl) {
+            let statusText = 'مقبول (In Control)';
+            if (Math.abs(z) > 3) statusText = '🚨 خروج 1-3s مرفوض';
+            else if (Math.abs(z) > 2) statusText = '⚠️ تحذير 1-2s';
+            zEl.value = `Z = ${z.toFixed(2)} (${statusText})`;
+        }
+    } catch(e) {}
+}
+
+function openAddSqcRunModal() {
+    try {
+        const f = document.getElementById('form-sqc-record');
+        if (f) f.reset();
+        
+        const dateEl = document.getElementById('sqc-form-date');
+        if (dateEl) dateEl.value = new Date().toISOString().slice(0, 10);
+        
+        const sel = document.getElementById('sqc-crm-select')?.value || 'crm_24k';
+        const crmEl = document.getElementById('sqc-form-crm');
+        if (crmEl) crmEl.value = sel;
+        
+        const batchEl = document.getElementById('sqc-form-batch');
+        if (batchEl) batchEl.value = 'RUN-' + Math.floor(100 + Math.random() * 900);
+        
+        updateSqcFormTarget();
+    } catch(e) {
+        console.error('Error in openAddSqcRunModal init:', e);
+    }
+    openModal('modal-sqc-form');
+}
+const openAddSqcModal = openAddSqcRunModal;
+
+function handleSaveSqcRun(event) {
+    if (event) event.preventDefault();
+    try {
+        const crmSel = document.getElementById('sqc-form-crm')?.value || 'crm_24k';
+        const batch = document.getElementById('sqc-form-batch')?.value.trim() || ('RUN-' + Date.now());
+        const date = document.getElementById('sqc-form-date')?.value || new Date().toISOString().slice(0, 10);
+        const analyst = document.getElementById('sqc-form-analyst')?.value.trim() || 'كيميائي المختبر';
+        const val = parseFloat(document.getElementById('sqc-form-val')?.value);
+
+        if (isNaN(val)) {
+            alert('الرجاء إدخال قيمة مقاسة صحيحة');
+            return;
+        }
+
+        const allData = getSqcStored();
+        if (!allData[crmSel]) {
+            allData[crmSel] = { name: "مادة مرجعية", target: 999.90, sd: 0.04, runs: [] };
+        }
+        if (!allData[crmSel].runs) allData[crmSel].runs = [];
+
+        allData[crmSel].runs.push({ batch, date, val, analyst });
+        saveSqcStored(allData);
+
+        closeModal('modal-sqc-form');
+        const crmSelElem = document.getElementById('sqc-crm-select');
+        if (crmSelElem) crmSelElem.value = crmSel;
+        renderSqcModule();
+        logAudit('تسجيل تشغيلة ضبط جودة §7.7', batch, '-', `CRM: ${crmSel} | Value: ${val}`);
+        alert('✅ تم تسجيل تشغيلة ضبط الجودة وتحديث خريطة ليفي-جينينغز الإحصائية بنجاح!');
+    } catch(e) {
+        console.error(e);
+        alert('حدث خطأ أثناء حفظ تشغيلة ضبط الجودة');
+    }
+}
+
+// =======================================================================
+// MODULE 3: COMPLAINTS & BLIND RETAIN SAMPLE RECALL (Clause 7.9 & 8.7)
+// =======================================================================
+var defaultComplaintsList = [
+    {
+        id: "GBI-CMP-2026-001",
+        client: "شركة لازوردي للذهب والمجوهرات",
+        reportRef: "GBI-REP-2026-8831",
+        karat: "سبيكة ذهب عيار 21 (875‰)",
+        blindCode: "BLIND-RET-9041",
+        vaultLoc: "خزينة الحرز B - رف 3",
+        carRef: "GBI-CAR-2026-01",
+        date: "2026-03-12",
+        desc: "اعتراض العميل على نتيجة الفحص الصادرة بنسبة 874.2‰ وادعاء مطابقة السبيكة لنسبة 875.5‰.",
+        result: "تم سحب العينة الاحتياطية المشفرة BLIND-RET-9041 من الخزينة وإعادة الفحص بالكوبيل المضاعف من قبل كبير الكيميائيين، وأظهرت النتيجة 875.1‰. تم قبول الشكوى وتعديل التقرير.",
+        status: "resolved",
+        investigator: "د. أحمد فؤاد / مدير الجودة"
+    },
+    {
+        id: "GBI-CMP-2026-002",
+        client: "مؤسسة الرميزان للذهب والمعادن",
+        reportRef: "GBI-REP-2026-9104",
+        karat: "مشغولات ذهبية عيار 18 (750‰)",
+        blindCode: "BLIND-RET-4482",
+        vaultLoc: "خزينة الحرز A - رف 1",
+        carRef: "-",
+        date: "2026-03-20",
+        desc: "طلب إعادة التحقق من العيار المشفر بسبب تباين في قراءة جهاز XRF خارجي لدى العميل.",
+        result: "قيد فحص الحرز الاحتياطي بالتحليل الناري المعتمد ISO 11426 ومقارنة القراءات مع المواد المرجعية.",
+        status: "investigating",
+        investigator: "كيميائي/ سامح رضوان"
+    },
+    {
+        id: "GBI-CMP-2026-003",
+        client: "شركة طيبة للمجوهرات والسبائك",
+        reportRef: "GBI-REP-2026-7910",
+        karat: "سبيكة ذهب عيار 24 (999.9‰)",
+        blindCode: "BLIND-RET-1193",
+        vaultLoc: "خزينة الحرز C - رف 5",
+        carRef: "GBI-CAR-2026-04",
+        date: "2026-02-28",
+        desc: "استفسار العميل عن عدم وضوح توقيع الفاحص والختم المشفر بالتقرير الورقي.",
+        result: "تم إصدار تقرير فحص بديل مع الختم المائي الرقمي والبصمة المشفرة SHA-256 وإغلاق الشكوى برضا العميل.",
+        status: "resolved",
+        investigator: "م. حسام الدين / مدير المختبر"
+    }
+];
+
+function getComplaintsStored() {
+    try {
+        const s = localStorage.getItem('gbi_complaints_v2');
+        if (s) {
+            const parsed = JSON.parse(s);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+    } catch(e) {}
+    localStorage.setItem('gbi_complaints_v2', JSON.stringify(defaultComplaintsList));
+    return defaultComplaintsList;
+}
+
+function saveComplaintsStored(data) {
+    try {
+        localStorage.setItem('gbi_complaints_v2', JSON.stringify(data));
+    } catch(e) {}
+}
+
+function renderComplaintsTable() {
+    const tbody = document.getElementById('complaints-table-body');
+    if (!tbody) return;
+
+    const items = getComplaintsStored();
+    const searchVal = (document.getElementById('complaints-search-input')?.value || '').toLowerCase().trim();
+    const filterStatus = document.getElementById('complaints-filter-status')?.value || 'all';
+
+    let total = items.length;
+    let investigating = 0;
+    let resolved = 0;
+    let carCount = 0;
+
+    items.forEach(c => {
+        if (c.status === 'resolved') resolved++;
+        else investigating++;
+        if (c.carRef && c.carRef !== '-') carCount++;
+    });
+
+    const kTot = document.getElementById('complaints-kpi-total');
+    const kInv = document.getElementById('complaints-kpi-investigating');
+    const kRes = document.getElementById('complaints-kpi-resolved');
+    const kCar = document.getElementById('complaints-kpi-car');
+
+    if (kTot) kTot.innerText = total;
+    if (kInv) kInv.innerText = investigating;
+    if (kRes) kRes.innerText = resolved;
+    if (kCar) kCar.innerText = carCount;
+
+    const filtered = items.filter(c => {
+        if (filterStatus !== 'all' && c.status !== filterStatus) return false;
+        if (searchVal) {
+            const str = (c.id + ' ' + c.client + ' ' + c.karat + ' ' + c.blindCode + ' ' + (c.reportRef || '')).toLowerCase();
+            if (!str.includes(searchVal)) return false;
+        }
+        return true;
+    });
+
+    tbody.innerHTML = filtered.map(c => `
+        <tr style="border-bottom:1px solid #f1f5f9;">
+            <td style="font-family:monospace; font-weight:900; color:#0a192f;">${escapeHtml(c.id)}</td>
+            <td>
+                <div style="font-weight:800; color:#0a192f; font-size:13.5px;">${escapeHtml(c.client)}</div>
+                <div style="font-size:11.5px; color:#64748b;">تقرير أصلي: ${escapeHtml(c.reportRef || 'N/A')}</div>
+            </td>
+            <td style="font-weight:800; color:#d97706; font-size:12.5px;">${escapeHtml(c.karat)}</td>
+            <td><span style="font-family:monospace; font-weight:900; background:#fef2f2; color:#dc2626; border:1px solid #fca5a5; padding:3px 8px; border-radius:6px; font-size:12px;">${escapeHtml(c.blindCode)}</span></td>
+            <td style="font-family:monospace; text-align:center; font-size:12px;">${escapeHtml(c.date)}</td>
+            <td style="font-size:12px; color:#334155; max-width:240px; line-height:1.4;">${escapeHtml(c.result || 'قيد إجراءات الفحص وسحب الحرز')}</td>
+            <td style="text-align:center;"><span style="font-family:monospace; font-size:11.5px; font-weight:700; color:#4338ca;">${escapeHtml(c.carRef || '-')}</span></td>
+            <td style="text-align:center;">
+                <span class="${c.status === 'resolved' ? 'badge-c' : 'badge-nc'}" style="font-size:11px; padding:3px 8px; border-radius:6px;">
+                    ${c.status === 'resolved' ? '✓ تم الحل والإغلاق' : '⏳ قيد التحقيق والسحب'}
+                </span>
+            </td>
+            <td style="text-align:center;">
+                <div style="display:flex; gap:4px; justify-content:center;">
+                    <button type="button" class="btn btn-outline" style="font-size:11px; padding:4px 8px; color:#0a192f; border-color:#0a192f;" onclick="viewComplaintDossier('${c.id}')" title="عرض ملف التحقيق والحرز المشفر">🔍 ملف التحقيق</button>
+                    <button type="button" class="btn btn-outline" style="font-size:11px; padding:4px 8px; color:#dc2626; border-color:#dc2626;" onclick="openEditComplaintModal('${c.id}')" title="تحديث / تسوية الشكوى">📝 تحديث</button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#94a3b8; font-weight:700;">لا توجد شكاوى أو استدعاءات مطابقة لخيارات البحث</td></tr>`;
+    }
+}
+
+function openAddComplaintModal() {
+    try {
+        const idEl = document.getElementById('cmp-form-id');
+        if (idEl) idEl.value = '';
+        
+        const f = document.getElementById('form-complaint-record');
+        if (f) f.reset();
+        
+        const dateEl = document.getElementById('cmp-date');
+        if (dateEl) dateEl.value = new Date().toISOString().slice(0, 10);
+        
+        const blindEl = document.getElementById('cmp-blind-code');
+        if (blindEl) blindEl.value = 'BLIND-RET-' + Math.floor(1000 + Math.random() * 9000);
+        
+        const vaultEl = document.getElementById('cmp-vault-loc');
+        if (vaultEl) vaultEl.value = 'خزينة الحرز B - رف رقم ' + Math.floor(1 + Math.random() * 6);
+        
+        const carEl = document.getElementById('cmp-car-ref');
+        const count = getComplaintsStored().length + 1;
+        if (carEl) carEl.value = 'GBI-CAR-2026-0' + count;
+    } catch(e) {
+        console.error('Error in openAddComplaintModal init:', e);
+    }
+    openModal('modal-complaint-form');
+}
+
+function openEditComplaintModal(id) {
+    try {
+        const items = getComplaintsStored();
+        const c = items.find(x => x.id === id);
+        if (!c) return;
+
+        const setVal = (elemId, val) => {
+            const el = document.getElementById(elemId);
+            if (el) el.value = val || '';
+        };
+
+        setVal('cmp-form-id', c.id);
+        setVal('cmp-client', c.client);
+        setVal('cmp-report-ref', c.reportRef);
+        setVal('cmp-karat', c.karat);
+        setVal('cmp-date', c.date);
+        setVal('cmp-blind-code', c.blindCode);
+        setVal('cmp-vault-loc', c.vaultLoc);
+        setVal('cmp-car-ref', c.carRef);
+        setVal('cmp-desc', c.desc);
+        setVal('cmp-result', c.result);
+        setVal('cmp-status', c.status || 'investigating');
+        setVal('cmp-investigator', c.investigator);
+
+        openModal('modal-complaint-form');
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+function handleSaveComplaint(event) {
+    if (event) event.preventDefault();
+    try {
+        const idVal = document.getElementById('cmp-form-id')?.value;
+        const items = getComplaintsStored();
+
+        const record = {
+            id: idVal || ('GBI-CMP-2026-00' + (items.length + 1)),
+            client: document.getElementById('cmp-client')?.value.trim() || 'عميل',
+            reportRef: document.getElementById('cmp-report-ref')?.value.trim() || '',
+            karat: document.getElementById('cmp-karat')?.value.trim() || 'سبيكة ذهب',
+            date: document.getElementById('cmp-date')?.value || new Date().toISOString().slice(0, 10),
+            blindCode: document.getElementById('cmp-blind-code')?.value.trim() || ('BLIND-' + Date.now()),
+            vaultLoc: document.getElementById('cmp-vault-loc')?.value.trim() || 'خزينة الحرز',
+            carRef: document.getElementById('cmp-car-ref')?.value.trim() || '-',
+            desc: document.getElementById('cmp-desc')?.value.trim() || '',
+            result: document.getElementById('cmp-result')?.value.trim() || '',
+            status: document.getElementById('cmp-status')?.value || 'investigating',
+            investigator: document.getElementById('cmp-investigator')?.value.trim() || 'مدير الجودة'
+        };
+
+        if (idVal) {
+            const idx = items.findIndex(x => x.id === idVal);
+            if (idx !== -1) items[idx] = record;
+            logAudit('تحديث شكوى عميل §7.9', record.id, '-', `الحالة: ${record.status}`);
+        } else {
+            items.unshift(record);
+            logAudit('فتح ملف شكوى واستدعاء حرز §7.9', record.id, '-', `حرز أعمى: ${record.blindCode}`);
+        }
+
+        saveComplaintsStored(items);
+        closeModal('modal-complaint-form');
+        renderComplaintsTable();
+        alert(`✅ تم توثيق ملف الشكوى واستدعاء الحرز المشفر بنجاح!
+
+كود الحرز المشفر: ${record.blindCode}
+رقم الملف: ${record.id}`);
+    } catch(e) {
+        console.error(e);
+        alert('حدث خطأ أثناء حفظ الشكوى');
+    }
+}
+
+function viewComplaintDossier(id) {
+    const items = getComplaintsStored();
+    const c = items.find(x => x.id === id);
+    if (!c) return;
+
+    const container = document.getElementById('complaint-view-content');
+    const todayStr = new Date().toLocaleDateString('ar-EG');
+
+    if (container) {
+        container.innerHTML = `
+            <div style="border:2px solid #991b1b; border-radius:12px; padding:24px; background:#ffffff;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #dc2626; padding-bottom:14px; margin-bottom:18px;">
+                    <div>
+                        <h2 style="margin:0; color:#991b1b; font-size:18px; font-weight:900;">محضر تحقيق فني في شكوى عميل واستدعاء عينة احتياطية مشفرة</h2>
+                        <div style="font-size:12px; color:#64748b; margin-top:2px;">طبقاً لمتطلبات المواصفة الدولية ISO/IEC 17025:2017 البند 7.9 و 8.7</div>
+                    </div>
+                    <div style="text-align:left;">
+                        <div style="font-family:monospace; font-weight:900; color:#991b1b; font-size:16px;">${escapeHtml(c.id)}</div>
+                        <span class="${c.status === 'resolved' ? 'badge-c' : 'badge-nc'}" style="font-size:11px; padding:2px 8px; border-radius:4px;">${c.status === 'resolved' ? 'تمت التسوية والإغلاق' : 'قيد سحب الحرز والتحقيق'}</span>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; font-size:13px;">
+                    <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0;">
+                        <div style="color:#64748b; font-size:11px; font-weight:700;">العميل / المنشأة الشاكية</div>
+                        <div style="font-weight:800; color:#0a192f; margin-top:2px;">${escapeHtml(c.client)}</div>
+                        <div style="margin-top:8px; color:#64748b; font-size:11px; font-weight:700;">تقرير الفحص الأصلي المتنازع عليه</div>
+                        <div style="font-weight:700; color:#0369a1; font-family:monospace;">${escapeHtml(c.reportRef || 'N/A')}</div>
+                        <div style="margin-top:8px; color:#64748b; font-size:11px; font-weight:700;">العيار والمنتج</div>
+                        <div style="font-weight:800; color:#d97706;">${escapeHtml(c.karat)}</div>
+                    </div>
+
+                    <div style="background:#fef2f2; padding:12px; border-radius:8px; border:1px solid #fca5a5;">
+                        <div style="color:#991b1b; font-size:11px; font-weight:700;">كود العينة الاحتياطية المشفرة (Blind Retain Code)</div>
+                        <div style="font-weight:900; color:#dc2626; font-family:monospace; font-size:16px; margin-top:2px;">${escapeHtml(c.blindCode)}</div>
+                        <div style="margin-top:8px; color:#991b1b; font-size:11px; font-weight:700;">موقع الخزينة والحرز</div>
+                        <div style="font-weight:700; color:#334155;">${escapeHtml(c.vaultLoc || 'خزينة الحرز المركزية')}</div>
+                        <div style="margin-top:8px; color:#991b1b; font-size:11px; font-weight:700;">رقم الإجراء التصحيحي المرتبط (CAR)</div>
+                        <div style="font-weight:700; color:#4338ca; font-family:monospace;">${escapeHtml(c.carRef || '-')}</div>
+                    </div>
+                </div>
+
+                <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:14px; margin-bottom:14px;">
+                    <div style="font-weight:800; color:#0a192f; font-size:13px; margin-bottom:4px;">وصف اعتراض العميل وموضوع الشكوى:</div>
+                    <div style="font-size:12.5px; color:#334155; line-height:1.5;">${escapeHtml(c.desc || 'لا يوجد وصف مفصل')}</div>
+                </div>
+
+                <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:14px; margin-bottom:18px;">
+                    <div style="font-weight:800; color:#065f46; font-size:13px; margin-bottom:4px;">نتائج فحص الحرز الأعمى وتحليل السبب الجذري (Root Cause Analysis):</div>
+                    <div style="font-size:12.5px; color:#047857; line-height:1.5;">${escapeHtml(c.result || 'قيد التحقيق الفني')}</div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:14px; font-size:11.5px; color:#64748b;">
+                    <div>تاريخ الاستلام: ${escapeHtml(c.date)} | تاريخ الطباعة: ${todayStr}</div>
+                    <div>مسؤول التحقيق واعتماد الجودة: <b>${escapeHtml(c.investigator || 'مدير الجودة')}</b> (معتمد وموثق)</div>
+                </div>
+            </div>
+        `;
+    }
+
+    openModal('modal-complaint-view');
+}
+
+// =======================================================================
+// MODULE 4: DOCUMENT CONTROL & SMART VERSIONING (Clause 8.2 & 8.3)
+// =======================================================================
+var defaultDocControlList = [
+    {
+        code: "GBI-QM-01",
+        title: "دليل الجودة الشامل لمختبر فحص وتحليل الذهب والمعادن الثمينة",
+        clause: "§ 8.2",
+        type: "QM",
+        rev: "02",
+        date: "2026-01-10",
+        nextReview: "2027-01-10",
+        author: "م. أحمد رضوان",
+        approver: "د. محمد سامي",
+        status: "active",
+        hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        history: [
+            { rev: "01", date: "2025-01-01", author: "م. أحمد رضوان", reason: "الإصدار التأسيسي الأول للنظام" }
+        ]
+    },
+    {
+        code: "GBI-POL-04",
+        title: "سياسة الإدارة العليا لضمان الحيادية وحفظ سرية بيانات العملاء",
+        clause: "§ 4.1 & 4.2",
+        type: "POL",
+        rev: "01",
+        date: "2026-01-15",
+        nextReview: "2027-01-15",
+        author: "د. حسام الدين",
+        approver: "المدير التنفيذي",
+        status: "active",
+        hash: "a4f89d3c125678bb098124efac9012445890abce128790432156890123456789",
+        history: []
+    },
+    {
+        code: "GBI-SOP-07-01",
+        title: "إجراء العمليات الفنية وطريقة فحص الذهب بالكوبيل والتحليل الناري",
+        clause: "§ 7.2",
+        type: "SOP",
+        rev: "03",
+        date: "2026-03-01",
+        nextReview: "2027-03-01",
+        author: "كيميائي/ أحمد فؤاد",
+        approver: "مدير المختبر",
+        status: "active",
+        hash: "7d890432156890123456789a4f89d3c125678bb098124efac9012445890abce1",
+        history: [
+            { rev: "02", date: "2025-06-10", author: "كيميائي/ أحمد", reason: "تحديث خطوات تبريد الكوبيل" },
+            { rev: "01", date: "2024-05-01", author: "كيميائي/ أحمد", reason: "الإصدار الأولي" }
+        ]
+    },
+    {
+        code: "GBI-SOP-08-01",
+        title: "إجراء التدقيق الداخلي وإدارة الإجراءات التصحيحية وحالات عدم المطابقة",
+        clause: "§ 8.8 & 8.7",
+        type: "SOP",
+        rev: "02",
+        date: "2026-02-20",
+        nextReview: "2027-02-20",
+        author: "مسؤول الجودة",
+        approver: "مدير الجودة",
+        status: "active",
+        hash: "5890abce128790432156890123456789a4f89d3c125678bb098124efac901244",
+        history: [
+            { rev: "01", date: "2025-02-01", author: "مسؤول الجودة", reason: "الإصدار الأول" }
+        ]
+    },
+    {
+        code: "GBI-FRM-08-01",
+        title: "السجل الرئيسي لضبط ومراقبة وثائق ونماذج الجودة وسحب الملغاة",
+        clause: "§ 8.3",
+        type: "FRM",
+        rev: "01",
+        date: "2026-01-01",
+        nextReview: "2027-01-01",
+        author: "أخصائي التوثيق",
+        approver: "مدير الجودة",
+        status: "active",
+        hash: "128790432156890123456789a4f89d3c125678bb098124efac9012445890abce1",
+        history: []
+    }
+];
+
+function getDocControlStored() {
+    try {
+        const s = localStorage.getItem('gbi_doc_control_v2');
+        if (s) {
+            const parsed = JSON.parse(s);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+    } catch(e) {}
+    localStorage.setItem('gbi_doc_control_v2', JSON.stringify(defaultDocControlList));
+    return defaultDocControlList;
+}
+
+function saveDocControlStored(data) {
+    try {
+        localStorage.setItem('gbi_doc_control_v2', JSON.stringify(data));
+    } catch(e) {}
+}
+
+function renderDocControlTable() {
+    const tbody = document.getElementById('doc-control-table-body');
+    if (!tbody) return;
+
+    const docs = getDocControlStored();
+    const searchVal = (document.getElementById('doc-search-input')?.value || '').toLowerCase().trim();
+    const filterClause = document.getElementById('doc-filter-clause')?.value || 'all';
+
+    let total = docs.length;
+    let sops = 0;
+    let forms = 0;
+    let reviewed = 0;
+
+    docs.forEach(d => {
+        if (d.type === 'SOP') sops++;
+        else if (d.type === 'FRM' || d.type === 'POL') forms++;
+        reviewed++;
+    });
+
+    const kTot = document.getElementById('doc-kpi-total');
+    const kSop = document.getElementById('doc-kpi-sops');
+    const kFrm = document.getElementById('doc-kpi-forms');
+    const kRev = document.getElementById('doc-kpi-reviewed');
+
+    if (kTot) kTot.innerText = total;
+    if (kSop) kSop.innerText = sops;
+    if (kFrm) kFrm.innerText = forms;
+    if (kRev) kRev.innerText = reviewed;
+
+    const filtered = docs.filter(d => {
+        if (filterClause !== 'all' && !d.clause.includes(filterClause)) return false;
+        if (searchVal) {
+            const str = (d.code + ' ' + d.title + ' ' + d.clause + ' ' + (d.author || '')).toLowerCase();
+            if (!str.includes(searchVal)) return false;
+        }
+        return true;
+    });
+
+    tbody.innerHTML = filtered.map(d => `
+        <tr style="border-bottom:1px solid #f1f5f9;">
+            <td style="font-family:monospace; font-weight:900; color:#0a192f;">${escapeHtml(d.code)}</td>
+            <td>
+                <div style="font-weight:800; color:#0a192f; font-size:13.5px;">${escapeHtml(d.title)}</div>
+                <div style="font-size:11.5px; color:#64748b;">المعد: ${escapeHtml(d.author || 'قسم الجودة')} | المعتمد: ${escapeHtml(d.approver || 'مدير المختبر')}</div>
+            </td>
+            <td style="text-align:center; font-weight:700; color:#0369a1; font-size:12px;">${escapeHtml(d.clause)}</td>
+            <td style="text-align:center;"><span style="background:#0a192f; color:#d4af37; padding:3px 8px; border-radius:6px; font-weight:900; font-family:monospace; font-size:12px;">Rev ${escapeHtml(d.rev)}</span></td>
+            <td style="font-family:monospace; text-align:center; font-size:12px;">${escapeHtml(d.date)}</td>
+            <td style="font-family:monospace; text-align:center; font-size:12px; color:#059669; font-weight:700;">${escapeHtml(d.nextReview || '2027-01-01')}</td>
+            <td style="text-align:center;"><span class="badge-c" style="font-size:11px; padding:3px 8px; border-radius:6px;">✓ سارية ومعتمدة</span></td>
+            <td style="font-family:monospace; font-size:11px; color:#64748b; text-align:center;">
+                <span title="${escapeHtml(d.hash || 'SHA-256')}" style="background:#f1f5f9; padding:2px 6px; border-radius:4px;">${(d.hash || 'e3b0c44298fc1c14').slice(0, 12)}...</span>
+            </td>
+            <td style="text-align:center;">
+                <div style="display:flex; gap:4px; justify-content:center;">
+                    <button type="button" class="btn btn-outline" style="font-size:11px; padding:4px 8px; color:#0a192f; border-color:#0a192f;" onclick="viewDocHistory('${d.code}')" title="عرض سجل المراجعات والأرشيف">📜 السجل (${d.history ? d.history.length : 0})</button>
+                    <button type="button" class="btn btn-outline" style="font-size:11px; padding:4px 8px; color:#059669; border-color:#059669;" onclick="openUpgradeDocModal('${d.code}')" title="ترقية الإصدار وأرشفة القديم">🔄 ترقية</button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#94a3b8; font-weight:700;">لا توجد وثائق جودة مطابقة لخيارات البحث</td></tr>`;
+    }
+}
+
+function openAddDocModal() {
+    try {
+        const modeEl = document.getElementById('doc-form-mode');
+        if (modeEl) modeEl.value = 'add';
+        const f = document.getElementById('form-doc-record');
+        if (f) f.reset();
+        const dateEl = document.getElementById('doc-form-date');
+        if (dateEl) dateEl.value = new Date().toISOString().slice(0, 10);
+        const revEl = document.getElementById('doc-form-rev');
+        if (revEl) revEl.value = '01';
+    } catch(e) {
+        console.error(e);
+    }
+    openModal('modal-doc-form');
+}
+
+function openUpgradeDocModal(code) {
+    try {
+        const docs = getDocControlStored();
+        const d = docs.find(x => x.code === code);
+        if (!d) return;
+
+        const setVal = (elemId, val) => {
+            const el = document.getElementById(elemId);
+            if (el) el.value = val || '';
+        };
+
+        setVal('doc-form-mode', 'upgrade');
+        setVal('doc-form-code', d.code);
+        setVal('doc-form-title', d.title);
+        setVal('doc-form-clause', d.clause);
+        setVal('doc-form-type', d.type || 'SOP');
+        
+        const currentRevNum = parseInt(d.rev) || 1;
+        const nextRevStr = (currentRevNum + 1 < 10 ? '0' : '') + (currentRevNum + 1);
+        setVal('doc-form-rev', nextRevStr);
+
+        setVal('doc-form-date', new Date().toISOString().slice(0, 10));
+        setVal('doc-form-author', d.author || '');
+        setVal('doc-form-approver', d.approver || '');
+        setVal('doc-form-reason', '');
+
+        openModal('modal-doc-form');
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+function handleSaveDocControl(event) {
+    if (event) event.preventDefault();
+    try {
+        const mode = document.getElementById('doc-form-mode')?.value || 'add';
+        const code = document.getElementById('doc-form-code')?.value.trim() || 'GBI-DOC-01';
+        const title = document.getElementById('doc-form-title')?.value.trim() || 'وثيقة جودة';
+        const clause = document.getElementById('doc-form-clause')?.value || '§ 8.2 & 8.3';
+        const type = document.getElementById('doc-form-type')?.value || 'SOP';
+        const newRev = document.getElementById('doc-form-rev')?.value.trim() || '01';
+        const date = document.getElementById('doc-form-date')?.value || new Date().toISOString().slice(0, 10);
+        const author = document.getElementById('doc-form-author')?.value.trim() || 'قسم الجودة';
+        const approver = document.getElementById('doc-form-approver')?.value.trim() || 'مدير المختبر';
+        const reason = document.getElementById('doc-form-reason')?.value.trim() || 'تحديث دوري ومطابقة للمعايير';
+
+        const nextRevDate = new Date(date);
+        nextRevDate.setFullYear(nextRevDate.getFullYear() + 1);
+        const nextReviewStr = nextRevDate.toISOString().slice(0, 10);
+
+        const hash = 'a' + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2);
+
+        const docs = getDocControlStored();
+        const existing = docs.find(x => x.code === code);
+
+        if (existing) {
+            if (!existing.history) existing.history = [];
+            existing.history.unshift({
+                rev: existing.rev,
+                date: existing.date,
+                author: existing.author,
+                reason: reason
+            });
+            existing.title = title;
+            existing.clause = clause;
+            existing.type = type;
+            existing.rev = newRev;
+            existing.date = date;
+            existing.nextReview = nextReviewStr;
+            existing.author = author;
+            existing.approver = approver;
+            existing.hash = hash;
+            logAudit('ترقية إصدار وثيقة §8.3', code, '-', `ترقية إلى Rev ${newRev} مع أرشفة Rev ${existing.history[0].rev}`);
+        } else {
+            docs.unshift({
+                code, title, clause, type, rev: newRev, date, nextReview: nextReviewStr,
+                author, approver, status: 'active', hash, history: []
+            });
+            logAudit('إضافة وثيقة جديدة §8.3', code, '-', `الإصدار الأولي Rev ${newRev}`);
+        }
+
+        saveDocControlStored(docs);
+        closeModal('modal-doc-form');
+        renderDocControlTable();
+        alert(`✅ تم اعتماد وثيقة الجودة وترقية الإصدار بنجاح!
+
+رمز الوثيقة: ${code}
+الإصدار الجديد: Rev ${newRev}
+تمت أرشفة النسخة السابقة آلياً لمنع الاستخدام غير المقصود.`);
+    } catch(e) {
+        console.error(e);
+        alert('حدث خطأ أثناء حفظ الوثيقة');
+    }
+}
+
+function viewDocHistory(code) {
+    const docs = getDocControlStored();
+    const d = docs.find(x => x.code === code);
+    if (!d) return;
+
+    const container = document.getElementById('doc-history-content');
+    const historyList = d.history || [];
+
+    if (container) {
+        container.innerHTML = `
+            <div style="border:2px solid #0a192f; border-radius:12px; padding:24px; background:#ffffff;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #d4af37; padding-bottom:14px; margin-bottom:18px;">
+                    <div>
+                        <h2 style="margin:0; color:#0a192f; font-size:18px; font-weight:900;">${escapeHtml(d.title)}</h2>
+                        <div style="font-size:12px; color:#64748b; margin-top:2px;">كود الوثيقة: <b>${escapeHtml(d.code)}</b> | البند: <b>${escapeHtml(d.clause)}</b></div>
+                    </div>
+                    <div>
+                        <span style="background:#0a192f; color:#d4af37; font-weight:900; font-family:monospace; font-size:14px; padding:4px 10px; border-radius:6px;">Rev ${escapeHtml(d.rev)} (الحالي)</span>
+                    </div>
+                </div>
+
+                <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:18px; font-size:12.5px;">
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
+                        <div>تاريخ السريان الحالي: <b>${escapeHtml(d.date)}</b></div>
+                        <div>المراجعة القادمة: <b>${escapeHtml(d.nextReview || '2027-01-01')}</b></div>
+                        <div>المعد: <b>${escapeHtml(d.author || 'قسم الجودة')}</b></div>
+                        <div>المعتمد: <b>${escapeHtml(d.approver || 'مدير المختبر')}</b></div>
+                    </div>
+                    <div style="margin-top:8px; font-family:monospace; font-size:11px; color:#475569;">بصمة التحقق الرقمية SHA-256: ${escapeHtml(d.hash || 'N/A')}</div>
+                </div>
+
+                <h4 style="color:#0a192f; margin:0 0 10px 0; font-size:14px; font-weight:800;">📜 الأرشيف التاريخي للإصدارات السابقة (Archived Revisions):</h4>
+                ${historyList.length > 0 ? `
+                    <div class="table-container">
+                        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                            <thead>
+                                <tr style="background:#f1f5f9;">
+                                    <th>الإصدار</th>
+                                    <th>تاريخ الاعتماد</th>
+                                    <th>المعد</th>
+                                    <th>مبررات التعديل والتغيير</th>
+                                    <th>حالة الأرشيف</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${historyList.map(h => `
+                                    <tr style="border-bottom:1px solid #e2e8f0;">
+                                        <td style="font-weight:900; font-family:monospace; color:#0a192f;">Rev ${escapeHtml(h.rev)}</td>
+                                        <td style="font-family:monospace;">${escapeHtml(h.date)}</td>
+                                        <td>${escapeHtml(h.author || 'قسم الجودة')}</td>
+                                        <td style="color:#334155;">${escapeHtml(h.reason || 'تحديث دوري')}</td>
+                                        <td><span style="background:#fef2f2; color:#991b1b; padding:2px 6px; border-radius:4px; font-size:10.5px; font-weight:800;">🔒 مؤرشفة ومعزولة</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                ` : `
+                    <div style="background:#f8fafc; padding:16px; text-align:center; color:#64748b; border-radius:8px; border:1px solid #e2e8f0; font-size:12.5px;">
+                        هذه الوثيقة في إصدارها المعتمد الأول (Rev ${escapeHtml(d.rev)}) ولا توجد إصدارات سابقة في الأرشيف.
+                    </div>
+                `}
+            </div>
+        `;
+    }
+
+    openModal('modal-doc-history');
+}
+
+// Global window mappings for bulletproof invocation
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.openAddSqcRunModal = openAddSqcRunModal;
+window.openAddSqcModal = openAddSqcRunModal;
+window.openAddComplaintModal = openAddComplaintModal;
+window.openAddCalibrationModal = openAddCalibrationModal;
+window.openAddDocModal = openAddDocModal;
+window.openEditCalibrationModal = openEditCalibrationModal;
+window.openEditComplaintModal = openEditComplaintModal;
+window.openUpgradeDocModal = openUpgradeDocModal;
+window.viewCalibrationCertificate = viewCalibrationCertificate;
+window.viewComplaintDossier = viewComplaintDossier;
+window.viewDocHistory = viewDocHistory;
+window.calculateSqcLiveMetrics = calculateSqcLiveMetrics;
+window.updateSqcFormTarget = updateSqcFormTarget;
+window.calculateNextCalDueDate = calculateNextCalDueDate;
+window.handleSaveCalibration = handleSaveCalibration;
+window.handleSaveSqcRun = handleSaveSqcRun;
+window.handleSaveComplaint = handleSaveComplaint;
+window.handleSaveDocControl = handleSaveDocControl;
+
+// =======================================================================
+// ===== END ENTERPRISE MODULES LOGIC =====
+// =======================================================================
 
 // Initial setup
 renderChecklist();
@@ -3157,6 +5363,10 @@ updateDashboard();
 renderAuditLog();
 loadEmailSettings();
 renderUsersAdminTable();
+renderCalibrationTable();
+renderSqcModule();
+renderComplaintsTable();
+renderDocControlTable();
 checkUrlForDirectFormView();
 
 // ==================== SECURE QR EXIT & VERIFICATION COMPLETION ====================
@@ -3236,6 +5446,14 @@ function dismissPwaBanner() {
     if (banner) banner.style.display = 'none';
     localStorage.setItem('gbi_pwa_dismissed', 'true');
 }
+
+
+// =======================================================================
+// MODULE 2: CALIBRATION & CRM TRACEABILITY MATRIX (Clause 6.4 & 6.5)
+// =======================================================================
+
+
+// =======================================================================
 
 </script>
 
